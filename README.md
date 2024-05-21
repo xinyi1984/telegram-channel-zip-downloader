@@ -1,6 +1,7 @@
 # telegram-channel-zip-downloader
 
-![Build](https://shields.io/github/actions/workflow/status/xinyi1984/telegram-channel-zip-downloader/Unzip pg and add pg.yml?branch=main&logo=github&label=Build)
+![Build](https://shields.io/github/actions/workflow/status/xinyi1984/telegram-channel-zip-downloader/Unzip-pg-and-add-pg.yml?branch=main&logo=github&label=Build)
+[![Total](https://shields.io/github/downloads/xinyi1984/TVBox-TV/total?logo=Bookmeter&label=Counts&logoColor=yellow&color=yellow)](https://github.com/xinyi1984/TVBox-TV/releases)
 
 ## Credits
 This repo relies on the following third-party projects:
