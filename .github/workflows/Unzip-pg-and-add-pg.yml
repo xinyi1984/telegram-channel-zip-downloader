@@ -41,8 +41,8 @@ jobs:
      
      - name: Release Note
        if: ${{ env.commit }}
-        working-directory: telegram-channel-zip-downloader
-        run: |
+       working-directory: telegram-channel-zip-downloader
+       run: |
           lastCommit=$(grep "xinyi1984\/xytv\/tree\/master" ${{ github.workspace }}/README.md |grep -o '[a-z0-9]\{40\}')
           export LESSCHARSET=utf-8
           echo -e "Credit: [xinyi1984/xytv/master](${{ env.upStream }})\nCommit: ${{ env.commit }}\nChangelog:" > apk/xinyi1984-Release.log
