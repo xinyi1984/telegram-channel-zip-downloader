@@ -41,6 +41,8 @@ jobs:
      
      - name: Release Note
        if: ${{ env.commit }}
+         git https://github.com/xinyi1984/telegram-channel-zip-downloader
+         cd telegram-channel-zip-downloader
        working-directory: telegram-channel-zip-downloader
        run: |
           lastCommit=$(grep "xinyi1984\/xytv\/tree\/master" ${{ github.workspace }}/README.md |grep -o '[a-z0-9]\{40\}')
