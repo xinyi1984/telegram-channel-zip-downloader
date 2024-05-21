@@ -36,7 +36,7 @@ jobs:
           git clone https://github.com/xinyi1984/xytv 
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#https://mirror.ghproxy.com/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
-          rm -r xytv/lib/*
+          mv ./pg/* xytv
           rm -r xytv/*.zip
           mv ./files/PandaGroovePG/*.zip xytv
           cd xytv
