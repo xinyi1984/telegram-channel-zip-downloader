@@ -4,7 +4,7 @@
 
 # 联系方式
 * 问题修改 | 功能定制 | 沟通交流
-* 请联系 telegram https://t.me/mexcmoe
+* 请联系 telegram https://t.me/klysys
 
 # 使用条件
 * python 3.9
