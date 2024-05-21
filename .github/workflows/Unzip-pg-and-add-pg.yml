@@ -38,7 +38,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
-        
+     
+     - name: Release Note
+       if: ${{ env.commit }}
+        working-directory: telegram-channel-zip-downloader
+        run: |
+          lastCommit=$(grep "xinyi1984\/xytv\/tree\/master" ${{ github.workspace }}/README.md |grep -o '[a-z0-9]\{40\}')
+          export LESSCHARSET=utf-8
+          echo -e "Credit: [xinyi1984/xytv/master](${{ env.upStream }})\nCommit: ${{ env.commit }}\nChangelog:" > apk/xinyi1984-Release.log
+          if [ "${{ env.commit }}" == "${lastCommit}" ]; then
+            git log --pretty=format:%B ${{ env.commitS }} -1 |sed -e "s# \{2,\}#\n#g" -e "/^Merge \(pull\|branch\|remote\)/d" -e '/^$/d' |cat -n |sort -k2,2 -k1,1n |uniq -f1 |sort -k1,1n |cut -f2- >> apk/${{ matrix.userName }}-Release.log
+          else
+            git log --pretty=format:%B ${{ env.commitS }}...${lastCommit:0:7} |sed -e "s# \{2,\}#\n#g" -e "/^Merge \(pull\|branch\|remote\)/d" -e '/^$/d' |cat -n |sort -k2,2 -k1,1n |uniq -f1 |sort -k1,1n |cut -f2- >> apk/${{ matrix.userName }}-Release.log
+          fi   
+     
      - name: Upload artifact
        if: ${{ env.commit }}
        uses: actions/upload-artifact@v4
