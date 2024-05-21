@@ -37,6 +37,7 @@ jobs:
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#https://mirror.ghproxy.com/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
           rm -r xytv/js/*
+          rm -r xytv/lib/*
           rm -r xytv/pg.jar
           rm -r xytv/jsm.json
           rm -r xytv/pg.jar.md5
