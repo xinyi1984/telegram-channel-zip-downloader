@@ -1,10 +1,11 @@
 name: Unzip pg and add pg
 
 on:
-  push:
-  schedule:
-    - cron: 15,45 0-18,22-23 * * *
-  workflow_dispatch:
+  # 监听电报频道的新消息事件
+  new-message-in-telegram-channel:
+    channel_id: '-1002006103120'
+    channel_name: 'tvapp'
+    message_id: '10'
   
 jobs:
 
