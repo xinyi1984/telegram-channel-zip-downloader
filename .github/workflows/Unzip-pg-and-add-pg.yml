@@ -22,6 +22,7 @@ jobs:
         python-version: 3.9 # 可以根据需要更改 Python 版本
      
      - name: telethon download telegram channel zip
+       if: ${{ env.commit }}
        run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
@@ -48,7 +49,7 @@ jobs:
           cd xytv
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
+          git add all
           git remote rm origin
           git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
           git commit -m "更新JSM Add unzipped files to xytv"
