@@ -48,8 +48,7 @@ jobs:
           cd xytv
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git diff --exit-code
-          git add --all
+          git add .
           git remote rm origin
           git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
           git commit -m "更新JSM Add unzipped files to xytv"
