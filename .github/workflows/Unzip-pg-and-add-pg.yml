@@ -1,15 +1,14 @@
 name: Unzip pg and add pg
 
 on:
-  # 监听电报频道的新消息事件
-  new-message-in-telegram-channel:
-    channel_id: '-1002006103120'
-    channel_name: 'tvapp'
-    message_id: '10'
+  push:
+  schedule:
+    - cron: 15,45 0-18,22-23 * * *
+  workflow_dispatch:
   
 jobs:
 
-  run-python-script:
+  run-python-script: 
 
     runs-on: ubuntu-latest
 
@@ -33,7 +32,7 @@ jobs:
          unzip -o files/PandaGroovePG/*.zip -d pg
 
      - name: Add unzipped files pg to xytv
-       #if: ${{ env.commit }}
+       if: ${{ env.commit }}
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
@@ -47,7 +46,6 @@ jobs:
           mv ./files/PandaGroovePG/*.zip xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#https://mirror.ghproxy.com/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
-          git diff --quiet .. || git diff --quiet .. | grep -q . && (git add . && git commit -m "Auto-commit changes" && git push)
           cd xytv
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
