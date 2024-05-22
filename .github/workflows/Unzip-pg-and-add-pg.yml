@@ -33,11 +33,11 @@ jobs:
 
      - name: Add unzipped files pg to xytv
        run: |
+          git clone https://github.com/xinyi1984/xytv 
           if git diff --quiet; then
             echo "没有未提交的更改。"
           else
             echo "存在未提交的更改。"
-            git clone https://github.com/xinyi1984/xytv 
             rm -r xytv/js/*
             rm -r xytv/lib/*
             rm -r xytv/pg.jar
