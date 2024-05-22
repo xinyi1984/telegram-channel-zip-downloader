@@ -49,9 +49,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if ! git diff-index --quiet HEAD --; then 
-          git add --all
-          git remote rm origin
-          git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
-          git commit -m "更新JSM Add unzipped files to xytv"
-          git push -f -u origin master
+            git add --all
+            git remote rm origin
+            git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
+            git commit -m "更新JSM Add unzipped files to xytv"
+            git push -f -u origin master
+          fi
        continue-on-error: true
