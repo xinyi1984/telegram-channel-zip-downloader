@@ -45,14 +45,13 @@ jobs:
           mv ./files/PandaGroovePG/*.zip xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#https://mirror.ghproxy.com/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
-          if ! git diff-index --quiet HEAD --; then 
-            cd xytv
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add --all
-            git remote rm origin
-            git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
-            git commit -m "更新JSM Add unzipped files to xytv"
-            git push -f -u origin master
-          fi
+          cd xytv
+          git diff --exit-code || git commit -am "ci lint and test"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git remote rm origin
+          git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
+          git commit -m "更新JSM Add unzipped files to xytv"
+          git push -f -u origin master
        continue-on-error: true
