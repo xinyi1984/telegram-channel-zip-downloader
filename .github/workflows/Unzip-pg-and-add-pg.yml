@@ -1,7 +1,7 @@
 name: Unzip pg and add pg
 
 on:
-  push:
+  #push:
   schedule:
     - cron: 15,45 0-18,22-23 * * *
   workflow_dispatch:
@@ -79,12 +79,11 @@ jobs:
        
      - name: Configure git
        run: |
-        git config --global user.name "xinyi1984"
-        git config --global user.email "75725458@qq.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
      - name: Commit and push changes
        run: |
-        cp ./files/PandaGroovePG/*.zip .
         git add .
         git commit -m "Add unzipped files"
      - name: Push changes to remote repository
