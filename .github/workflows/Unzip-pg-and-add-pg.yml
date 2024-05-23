@@ -20,47 +20,62 @@ jobs:
     steps:
      - name: Checkout
        uses: actions/checkout@v3
-       
-     # 假设你的ZIP文件在仓库的根目录下，名为pg/pg.*.zip
-     - name: Get hash of repository ZIP file
-       id: pg/pg.*.zip-hash
-       run: |
-          if [[ -f "pg/pg.*.zip" ]]; then
-            echo "::set-output name=hash::$(sha256sum pg/pg.*.zip.zip | awk '{print $1}')"
-          else
-            echo "ZIP file not found in the repository."
-            exit 1
-          fi
+       with:
+         fetch-depth: 0 # 获取所有历史记录，以便搜索ZIP文件
+          
      - name: Set up Python 3.9
        uses: actions/setup-python@v5
        with:
         python-version: 3.9 # 可以根据需要更改 Python 版本
-     
-     - name: Calculate hash of downloaded ZIP file
-       id: /files/PandaGroovePG/*.zip-hash
-       run: |
-          echo "::set-output name=hash::$(sha256sum /files/PandaGroovePG/*.zip.zip | awk '{print $1}')"
-
-     - name: Compare hashes
-       id: compare-hashes
-       run: |
-          DOWNLOADED_HASH=${{ steps.downloaded-zip-hash.outputs.hash }}
-          REPOSITORY_HASH=${{ steps.repository-zip-hash.outputs.hash }}
-
-          if [[ "$DOWNLOADED_HASH" == "$REPOSITORY_HASH" ]]; then
-            echo "ZIP files are identical, skipping further steps."
-            echo "::set-output name=skip_steps::true"
-          else
-            echo "ZIP files are not identical, proceeding with further steps."
-            echo "::set-output name=skip_steps::false"
-          fi
-
+        
      - name: telethon download telegram channel zip
        run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
+        
+     - name: Find ZIP files in downloaded directory
+       id: find-downloaded-zip
+       run: |
+          # 查找下载的ZIP文件
+          DOWNLOADED_ZIP=$(ls /files/PandaGroovePG/*.zip 2>/dev/null)
+          if [[ -n "$DOWNLOADED_ZIP" ]]; then
+            echo "::set-output name=downloaded-zip::${DOWNLOADED_ZIP##*/}" # 提取文件名
+          else
+            echo "没有找到下载的ZIP文件。"
+            exit 1
+          fi
+
+     - name: Find ZIP files in repository
+       id: find-repo-zip
+       run: |
+          # 查找仓库中的ZIP文件
+          REPO_ZIP=$(find . -type f -name "*.zip" | head -n 1) # 假设只有一个ZIP文件，或者取第一个作为比较对象
+          if [[ -n "$REPO_ZIP" ]]; then
+            echo "::set-output name=repo-zip::${REPO_ZIP##*/}" # 提取文件名
+          else
+            echo "仓库中没有找到ZIP文件。"
+            exit 1
+          fi
+
+     - name: Compare filenames and skip work if they are the same
+       id: compare-filenames
+       run: |
+          DOWNLOADED_ZIP_NAME=${{ steps.find-downloaded-zip.outputs.downloaded-zip }}
+          REPO_ZIP_NAME=${{ steps.find-repo-zip.outputs.repo-zip }}
+
+          # 比较文件名
+          if [[ "$DOWNLOADED_ZIP_NAME" == "$REPO_ZIP_NAME" ]]; then
+            echo "ZIP文件名相同，跳过后续工作。"
+            exit 0
+          else
+            echo "ZIP文件名不同，继续执行后续工作。"
+          fi
+
+      # 使用 if 条件判断来决定是否执行这个步骤
+      
      - name: Unzip file
+       if: ${{ steps.compare-filenames.outcome != 'success' }}
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
@@ -92,6 +107,7 @@ jobs:
           fi
        continue-on-error: true
      - name: Commit and push changes
+       if: ${{ steps.compare-filenames.outcome != 'success' }}
        run: |
         rm -r ./pg*.zip
         mv ./files/PandaGroovePG/*.zip ./pg
@@ -100,6 +116,7 @@ jobs:
         git add .
         git commit -m "Add zip files"
      - name: Push changes to remote repository
+       if: ${{ steps.compare-filenames.outcome != 'success' }}
        uses: ad-m/github-push-action@master
        with:
           github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
