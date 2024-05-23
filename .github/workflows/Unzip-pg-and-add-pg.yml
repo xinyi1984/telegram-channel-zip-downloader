@@ -77,13 +77,14 @@ jobs:
           fi
        continue-on-error: true
        
-     - name: Push to main
-       #if: ${{ env.commit }}
+     - name: Configure git
        run: |
-          git config --global user.name 'xinyi1984'
-          git config --global user.email '75725458@q.com'
-          git add ./files/PandaGroovePG/*.zip
-          git commit -m "Add ZIP file to repository"
-          git push -f -u origin main
-          #continue-on-error: true 是因为 git commit 会失败也是预期的，这个步骤可以忽略失败。加上这个命令就可以在这个步骤失败的时候，不会影响其他步骤
-       continue-on-error: true
+        git config --global user.name "xinyi1984"
+        git config --global user.email "75725458@qq.com"
+
+     - name: Commit and push changes
+       run: |
+        cp ./files/PandaGroovePG/*.zip .
+        git add .
+        git commit -m "Add unzipped files"
+        git push origin ${{ github.ref }}
