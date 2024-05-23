@@ -31,20 +31,28 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
-     
-     - name: Check if downloaded ZIP file already exists in the repository
-       id: check-zip-existence
+        
+     - name: Get SHA256 hash of downloaded ZIP
+       id: downloaded-zip-hash
        run: |
-          DOWNLOADED_ZIP="files/PandaGroovePG/*.zip"
-          REPOSITORY_ZIP="./*.zip" # Replace with the name of the ZIP file in your repository
+          echo "::set-output name=hash::$(sha256sum /files/PandaGroovePG/*.zip | awk '{print $1}')"
 
-          if [ -f "$REPOSITORY_ZIP" ]; then
-            echo "ZIP file already exists in the repository, skipping further steps."
-            echo "::set-output name=skip_steps::true"
+     - name: Get SHA256 hash of repository ZIP
+       id: repository-zip-hash
+       shell: bash
+       run: |
+          REPOSITORY_ZIP="/pg/*.zip" # Replace with the name of the ZIP file in your repository
+          if [[ -f "$REPOSITORY_ZIP" ]]; then
+            echo "::set-output name=hash::$(sha256sum "$REPOSITORY_ZIP" | awk '{print $1}')"
           else
-            echo "ZIP file does not exist in the repository, proceeding with further steps."
-            echo "::set-output name=skip_steps::false"
+            echo "ZIP file does not exist in the repository."
+            exit 1
           fi
+
+     - name: Compare hashes and skip steps if identical
+       if: steps.downloaded-zip-hash.outputs.hash == steps.repository-zip-hash.outputs.hash
+       run: |
+          echo "ZIP files are identical, skipping further steps."
           
      - name: Unzip file
        run: |
