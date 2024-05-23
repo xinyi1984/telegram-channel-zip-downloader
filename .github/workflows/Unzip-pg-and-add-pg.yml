@@ -32,15 +32,37 @@ jobs:
         pip install -r requirements.txt
         python main.py
      
+     # 获取当前仓库的ZIP文件名
+     - name: Get current ZIP filename in repository
+       id: get-zip-filename
+       run: |
+          ZIP_FILE_NAME="*.zip" # 替换为你的ZIP文件名
+          if [ -f "$ZIP_FILE_NAME" ]; then
+            echo "::set-output name=zip_filename::$ZIP_FILE_NAME"
+          else
+            echo "ZIP file does not exist in the repository."
+            exit 1 # 如果ZIP文件不存在，可以选择退出工作流或进行其他操作
+          fi
+
+      # 比较下载的ZIP文件名和当前仓库的ZIP文件名
+     - name: Compare downloaded ZIP filename with repository ZIP filename
+       id: compare-filenames
+       run: |
+          DOWNLOADED_ZIP_FILENAME="./files/PandaGroovePG/*.zip"
+          REPOSITORY_ZIP_FILENAME="${{ steps.get-zip-filename.outputs.zip_filename }}"
+
+          if [ "$DOWNLOADED_ZIP_FILENAME" == "$REPOSITORY_ZIP_FILENAME" ]; then
+            echo "Downloaded ZIP filename is the same as the repository ZIP filename. Skipping further steps."
+            exit 0 # 跳过后续步骤
+          else
+            echo "Downloaded ZIP filename is different. Continuing with further steps."
+          fi
+
+      # 如果文件名不同，则继续执行后续步骤（例如移动ZIP文件到仓库目录等）
+
      - name: Unzip file
        run: |
-         if [ "./files/PandaGroovePG/*.zip" == "./*.zip" ]; then
-          echo "相同."
-          exit 0 # 跳过后续步骤
-         else
-         echo "不相同继续."
           unzip -o files/PandaGroovePG/*.zip -d pg
-         fi
      - name: Add unzipped files pg to xytv
        run: |
           git clone https://github.com/xinyi1984/xytv 
