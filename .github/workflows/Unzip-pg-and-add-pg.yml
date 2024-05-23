@@ -79,7 +79,7 @@ jobs:
        continue-on-error: true
      - name: Commit and push changes
        run: |
-        rm -r ./*.zip
+        rm -r ./pg*.zip
         mv ./files/PandaGroovePG/*.zip ./pg
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
