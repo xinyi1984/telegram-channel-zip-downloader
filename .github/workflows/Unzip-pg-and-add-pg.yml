@@ -16,6 +16,15 @@ jobs:
      - name: Checkout
        uses: actions/checkout@v1
      
+     - name: Check New Commit
+       run: |
+          upStream=https://github.com/xinyi1984/xytv
+          echo "upStream=$upStream" >> $GITHUB_ENV
+          commit=$(curl -sL $upStream/commits/xytv |grep -o "/xinyi1984/xytv/commit/[a-z0-9]\+" |head -1 | cut -d\/ -f5)
+          if ! grep -q "$commit" README.md || [ "${{ inputs.rebuild }}" == "true" ]; then
+            echo "commit=$commit" >> $GITHUB_ENV
+            echo "commitS=${commit:0:7}" >> $GITHUB_ENV
+          fi
      - name: Set up Python 3.9
        uses: actions/setup-python@v5
        with:
@@ -57,4 +66,20 @@ jobs:
             git commit -m "更新JSM Add unzipped files to xytv"
             git push -f -u origin master
           fi
+       continue-on-error: true
+       
+     - name: Push to master
+       if: ${{ env.commit }}
+       run: |
+          rm -rf telegram-channel-zip-downloader
+          sed -i '/url =/d' ./.git/config
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url --add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git pull --rebase
+          sed -i "/xinyi1984\/xytv/s#Updated: [a-zA-Z0-9]*#Updated: ${{ env.commit }}#" README.md
+          git add --all
+          git commit -m "${{ env.commit }}"
+          git push -u -f origin main
+          #continue-on-error: true 是因为 git commit 会失败也是预期的，这个步骤可以忽略失败。加上这个命令就可以在这个步骤失败的时候，不会影响其他步骤
        continue-on-error: true
