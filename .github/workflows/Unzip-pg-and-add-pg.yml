@@ -55,6 +55,7 @@ jobs:
        id: list-repo-zip-files
        run: |
           # 列出仓库根目录下的 ZIP 文件
+          cd telegram-channel-zip-downloader
           REPO_ZIP_FILES=$(ls *.zip)
 
           # 如果没有找到 ZIP 文件，则直接退出
