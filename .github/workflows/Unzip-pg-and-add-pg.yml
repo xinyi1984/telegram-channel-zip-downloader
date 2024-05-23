@@ -19,7 +19,7 @@ jobs:
 
     steps:
      - name: Checkout
-       uses: actions/checkout@v1
+       uses: actions/checkout@v3
        
      - name: Set up Python 3.9
        uses: actions/setup-python@v5
@@ -36,7 +36,7 @@ jobs:
      - name: Get current ZIP filename in repository
        id: get-zip-filename
        run: |
-          ZIP_FILE_NAME="*.zip" # 替换为你的ZIP文件名
+          ZIP_FILE_NAME="pg.*.zip" # 替换为你的ZIP文件名
           if [ -f "$ZIP_FILE_NAME" ]; then
             echo "::set-output name=zip_filename::$ZIP_FILE_NAME"
           else
