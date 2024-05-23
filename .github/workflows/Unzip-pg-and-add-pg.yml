@@ -26,20 +26,24 @@ jobs:
             echo "commitS=${commit:0:7}" >> $GITHUB_ENV
           fi
      - name: Set up Python 3.9
+       if: ${{ env.commit }}
        uses: actions/setup-python@v5
        with:
         python-version: 3.9 # 可以根据需要更改 Python 版本
      
      - name: telethon download telegram channel zip
+       if: ${{ env.commit }}
        run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
      
      - name: Unzip file
+       if: ${{ env.commit }}
        run: |
          unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
+       if: ${{ env.commit }}
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
