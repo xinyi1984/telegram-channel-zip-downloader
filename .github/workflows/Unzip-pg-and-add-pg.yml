@@ -48,7 +48,7 @@ jobs:
      - name: Compare downloaded ZIP filename with repository ZIP filename
        id: compare-filenames
        run: |
-          DOWNLOADED_ZIP_FILENAME="./files/PandaGroovePG/*.zip"
+          DOWNLOADED_ZIP_FILENAME="files/PandaGroovePG/pg.20240523-2055.zip"
           REPOSITORY_ZIP_FILENAME="${{ steps.get-zip-filename.outputs.zip_filename }}"
 
           if [ "$DOWNLOADED_ZIP_FILENAME" == "$REPOSITORY_ZIP_FILENAME" ]; then
