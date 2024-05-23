@@ -34,40 +34,38 @@ jobs:
         pip install -r requirements.txt
         python main.py
         
-     # 假设下载的 ZIP 文件现在位于 ./files/PandaGroovePG/ 目录下
      - name: Get downloaded ZIP filename
        id: get-downloaded-zip
        run: |
-          # 列出 ./files/PandaGroovePG/ 目录下的 ZIP 文件
+          # 假设下载的ZIP文件是唯一的，你可以使用ls命令来获取文件名
           DOWNLOADED_ZIP=$(ls ./files/PandaGroovePG/*.zip)
-
-          # 检查是否找到了 ZIP 文件
+          # 检查是否找到了ZIP文件
           if [[ -n "$DOWNLOADED_ZIP" ]]; then
-            # 提取 ZIP 文件名（不包含路径）
+            # 提取ZIP文件名（不包含路径）
             DOWNLOADED_ZIP_NAME=$(basename "$DOWNLOADED_ZIP")
             echo "::set-output name=zip-name::$DOWNLOADED_ZIP_NAME"
           else
-            echo "没有找到下载的 ZIP 文件。"
-            exit 1
+            echo "没有找到下载的ZIP文件。"
+            exit 0
           fi
 
      - name: List ZIP files in repository
        id: list-repo-zip-files
        run: |
-          # 列出仓库根目录下的 ZIP 文件
-          git clone https://github.com/xinyi1984/telegram-channel-zip-downloader
-          cd telegram-channel-zip-downloader
-          REPO_ZIP_FILES=$(ls *.zip)
+          # Git命令不会直接列出文件，但你可以通过一些技巧来检查仓库中是否有匹配的ZIP文件
+          # 例如，你可以使用git ls-tree命令来获取特定提交的目录列表
+          # 这里假设你知道要比较的提交的SHA值，或者你可以使用HEAD来表示最新的提交
+          ZIP_FILES=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
 
-          # 如果没有找到 ZIP 文件，则直接退出
-          if [[ -z "$REPO_ZIP_FILES" ]]; then
-            echo "仓库中没有找到 ZIP 文件。"
+          # 检查是否找到了ZIP文件
+          if [[ -n "$ZIP_FILES" ]]; then
+            # 假设我们只对第一个ZIP文件名感兴趣，或者你可以添加逻辑来处理多个文件名
+            REPO_ZIP_NAME=$(echo "$ZIP_FILES" | head -n 1)
+            echo "::set-output name=repo-zip-name::$REPO_ZIP_NAME"
+          else
+            echo "仓库中没有找到ZIP文件。"
             exit 0
           fi
-
-          # 假设我们只对第一个 ZIP 文件感兴趣，或者你知道要比较的具体文件名
-          REPO_ZIP_NAME=$(basename "$REPO_ZIP_FILES")
-          echo "::set-output name=repo-zip-name::$REPO_ZIP_NAME"
 
      - name: Compare filenames and decide to skip work
        id: compare-and-skip
@@ -81,15 +79,16 @@ jobs:
             exit 0
           else
             echo "ZIP 文件名不同，继续执行后续工作。"
+            # 设置一个输出变量，以便在后续步骤中判断是否应该执行工作
+            echo "::set-output name=skip-work::false"
           fi
-
-      # 后续步骤
       
      - name: Unzip file
-       if: ${{ !success() }}
+       if: ${{ !steps.compare-and-skip.outputs.skip-work }}
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
+       if: ${{ !steps.compare-and-skip.outputs.skip-work }}
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
@@ -118,7 +117,7 @@ jobs:
           fi
        continue-on-error: true
      - name: Commit and push changes
-       if: ${{ !success() }}
+       if: ${{ !steps.compare-and-skip.outputs.skip-work }}
        run: |
         rm -r ./*.zip
         mv ./files/PandaGroovePG/*.zip .
@@ -127,7 +126,7 @@ jobs:
         git add .
         git commit -m "Add zip files"
      - name: Push changes to remote repository
-       if: ${{ !success() }}
+       if: ${{ !steps.compare-and-skip.outputs.skip-work }}
        uses: ad-m/github-push-action@master
        with:
           github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
