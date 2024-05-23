@@ -34,48 +34,57 @@ jobs:
         pip install -r requirements.txt
         python main.py
         
-     - name: Find ZIP files in downloaded directory
-       id: find-downloaded-zip
+     # 假设下载的 ZIP 文件现在位于 ./files/PandaGroovePG/ 目录下
+     - name: Get downloaded ZIP filename
+       id: get-downloaded-zip
        run: |
-          # 查找下载的ZIP文件
-          DOWNLOADED_ZIP=$(ls ./files/PandaGroovePG/*.zip 2>/dev/null)
+          # 列出 ./files/PandaGroovePG/ 目录下的 ZIP 文件
+          DOWNLOADED_ZIP=$(ls ./files/PandaGroovePG/*.zip)
+
+          # 检查是否找到了 ZIP 文件
           if [[ -n "$DOWNLOADED_ZIP" ]]; then
-            echo "::set-output name=downloaded-zip::${DOWNLOADED_ZIP##*/}" # 提取文件名
+            # 提取 ZIP 文件名（不包含路径）
+            DOWNLOADED_ZIP_NAME=$(basename "$DOWNLOADED_ZIP")
+            echo "::set-output name=zip-name::$DOWNLOADED_ZIP_NAME"
           else
-            echo "没有找到下载的ZIP文件。"
+            echo "没有找到下载的 ZIP 文件。"
             exit 1
           fi
 
-     - name: Find ZIP files in repository
-       id: find-repo-zip
+     - name: List ZIP files in repository
+       id: list-repo-zip-files
        run: |
-          # 查找仓库中的ZIP文件
-          REPO_ZIP=$(find . -type f -name ".*.zip" | head -n 1) # 假设只有一个ZIP文件，或者取第一个作为比较对象
-          if [[ -n "$REPO_ZIP" ]]; then
-            echo "::set-output name=repo-zip::${REPO_ZIP##*/}" # 提取文件名
-          else
-            echo "仓库中没有找到ZIP文件。"
-            exit 1
+          # 列出仓库根目录下的 ZIP 文件
+          REPO_ZIP_FILES=$(ls *.zip)
+
+          # 如果没有找到 ZIP 文件，则直接退出
+          if [[ -z "$REPO_ZIP_FILES" ]]; then
+            echo "仓库中没有找到 ZIP 文件。"
+            exit 0
           fi
 
-     - name: Compare filenames and skip work if they are the same
-       id: compare-filenames
+          # 假设我们只对第一个 ZIP 文件感兴趣，或者你知道要比较的具体文件名
+          REPO_ZIP_NAME=$(basename "$REPO_ZIP_FILES")
+          echo "::set-output name=repo-zip-name::$REPO_ZIP_NAME"
+
+     - name: Compare filenames and decide to skip work
+       id: compare-and-skip
        run: |
-          DOWNLOADED_ZIP_NAME=${{ steps.find-downloaded-zip.outputs.downloaded-zip }}
-          REPO_ZIP_NAME=${{ steps.find-repo-zip.outputs.repo-zip }}
+          DOWNLOADED_ZIP_NAME=${{ steps.get-downloaded-zip.outputs.zip-name }}
+          REPO_ZIP_NAME=${{ steps.list-repo-zip-files.outputs.repo-zip-name }}
 
           # 比较文件名
           if [[ "$DOWNLOADED_ZIP_NAME" == "$REPO_ZIP_NAME" ]]; then
-            echo "ZIP文件名相同，跳过后续工作。"
+            echo "ZIP 文件名相同，跳过后续工作。"
             exit 0
           else
-            echo "ZIP文件名不同，继续执行后续工作。"
+            echo "ZIP 文件名不同，继续执行后续工作。"
           fi
 
-      # 使用 if 条件判断来决定是否执行这个步骤
+      # 后续步骤
       
      - name: Unzip file
-       if: ${{ steps.compare-filenames.outcome != 'success' }}
+       if: ${{ !success() }}
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
@@ -107,7 +116,7 @@ jobs:
           fi
        continue-on-error: true
      - name: Commit and push changes
-       if: ${{ steps.compare-filenames.outcome != 'success' }}
+       if: ${{ !success() }}
        run: |
         rm -r .*.zip
         mv ./files/PandaGroovePG/*.zip .
@@ -116,7 +125,7 @@ jobs:
         git add .
         git commit -m "Add zip files"
      - name: Push changes to remote repository
-       if: ${{ steps.compare-filenames.outcome != 'success' }}
+       if: ${{ !success() }}
        uses: ad-m/github-push-action@master
        with:
           github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
