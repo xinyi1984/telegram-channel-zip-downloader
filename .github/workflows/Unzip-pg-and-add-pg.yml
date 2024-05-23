@@ -5,6 +5,11 @@ on:
   schedule:
     - cron: 15,45 0-18,22-23 * * *
   workflow_dispatch:
+    inputs:
+      rebuild:
+        description: '忽略构建记录以重新构建'
+        required: false
+        type: boolean
   
 jobs:
 
