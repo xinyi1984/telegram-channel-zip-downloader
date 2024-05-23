@@ -21,39 +21,45 @@ jobs:
      - name: Checkout
        uses: actions/checkout@v3
        
+     # 假设你的ZIP文件在仓库的根目录下，名为pg/pg.*.zip
+     - name: Get hash of repository ZIP file
+       id: pg/pg.*.zip-hash
+       run: |
+          if [[ -f "pg/pg.*.zip" ]]; then
+            echo "::set-output name=hash::$(sha256sum pg/pg.*.zip.zip | awk '{print $1}')"
+          else
+            echo "ZIP file not found in the repository."
+            exit 1
+          fi
      - name: Set up Python 3.9
        uses: actions/setup-python@v5
        with:
         python-version: 3.9 # 可以根据需要更改 Python 版本
      
+     - name: Calculate hash of downloaded ZIP file
+       id: /files/PandaGroovePG/*.zip-hash
+       run: |
+          echo "::set-output name=hash::$(sha256sum /files/PandaGroovePG/*.zip.zip | awk '{print $1}')"
+
+     - name: Compare hashes
+       id: compare-hashes
+       run: |
+          DOWNLOADED_HASH=${{ steps.downloaded-zip-hash.outputs.hash }}
+          REPOSITORY_HASH=${{ steps.repository-zip-hash.outputs.hash }}
+
+          if [[ "$DOWNLOADED_HASH" == "$REPOSITORY_HASH" ]]; then
+            echo "ZIP files are identical, skipping further steps."
+            echo "::set-output name=skip_steps::true"
+          else
+            echo "ZIP files are not identical, proceeding with further steps."
+            echo "::set-output name=skip_steps::false"
+          fi
+
      - name: telethon download telegram channel zip
        run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
-        
-     - name: Get SHA256 hash of downloaded ZIP
-       id: downloaded-zip-hash
-       run: |
-          echo "::set-output name=hash::$(sha256sum /files/PandaGroovePG/*.zip | awk '{print $1}')"
-
-     - name: Get SHA256 hash of repository ZIP
-       id: repository-zip-hash
-       shell: bash
-       run: |
-          REPOSITORY_ZIP="/pg/*.zip" # Replace with the name of the ZIP file in your repository
-          if [[ -f "$REPOSITORY_ZIP" ]]; then
-            echo "::set-output name=hash::$(sha256sum "$REPOSITORY_ZIP" | awk '{print $1}')"
-          else
-            echo "ZIP file does not exist in the repository."
-            exit 1
-          fi
-
-     - name: Compare hashes and skip steps if identical
-       if: steps.downloaded-zip-hash.outputs.hash == steps.repository-zip-hash.outputs.hash
-       run: |
-          echo "ZIP files are identical, skipping further steps."
-          
      - name: Unzip file
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
