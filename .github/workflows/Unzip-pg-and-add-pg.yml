@@ -34,27 +34,40 @@ jobs:
         pip install -r requirements.txt
         python main.py
         
-     - name: Get downloaded ZIP filename
+     - name: Get the name of the downloaded ZIP file
+       id: get-zip-name
        run: |
-          DOWNLOADED_ZIP_NAME=$(basename ./files/PandaGroovePG/downloaded-zip.zip)
-          echo "DOWNLOADED_ZIP_NAME=$DOWNLOADED_ZIP_NAME" >> $GITHUB_ENV
+          # 获取下载的ZIP文件名
+          downloaded_zip_name=$(ls ./files/PandaGroovePG/*.zip | head -n 1)
+          echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
 
-     - name: List ZIP files in repository
+     - name: List ZIP files in the repository
+       id: list-zip-files
        run: |
-          ZIP_FILES=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
-          if [[ ! -z "$ZIP_FILES" ]]; then
-            REPO_ZIP_NAMES=$(echo "$ZIP_FILES" | tr '\n' ' ')  # 将文件名列表转换为空格分隔的字符串
-            if [[ " $REPO_ZIP_NAMES " == *" $DOWNLOADED_ZIP_NAME "* ]]; then
-              echo "REPO_HAS_SAME_ZIP=true" >> $GITHUB_ENV
-            fi
+          # 列出仓库中的所有ZIP文件
+          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
+          echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
+
+     - name: Check if downloaded ZIP filename matches a file in the repository
+       id: check-match
+       run: |
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配
+          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
+          zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
+          if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
+            echo "ZIP filename matches a file in the repository."
+            echo "ZIP_MATCH=true" >> $GITHUB_ENV
+          else
+            echo "ZIP filename does not match any file in the repository."
+            echo "ZIP_MATCH=false" >> $GITHUB_ENV
           fi
       
      - name: Unzip file
-       if: env.REPO_HAS_SAME_ZIP != 'true'
+       if: env.ZIP_MATCH == 'false'
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
-       if: env.REPO_HAS_SAME_ZIP != 'true'
+       if: env.ZIP_MATCH == 'false'
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
@@ -83,7 +96,7 @@ jobs:
           fi
        continue-on-error: true
      - name: Commit and push changes
-       if: env.REPO_HAS_SAME_ZIP != 'true'
+       if: env.ZIP_MATCH == 'false'
        run: |
         rm -r ./*.zip
         mv ./files/PandaGroovePG/*.zip .
@@ -92,7 +105,7 @@ jobs:
         git add .
         git commit -m "Add zip files"
      - name: Push changes to remote repository
-       if: env.REPO_HAS_SAME_ZIP != 'true'
+       if: env.ZIP_MATCH == 'false'
        uses: ad-m/github-push-action@master
        with:
           github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
