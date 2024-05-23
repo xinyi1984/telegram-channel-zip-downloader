@@ -76,19 +76,10 @@ jobs:
             git push -f -u origin master
           fi
        continue-on-error: true
-       
-     - name: Configure git
-       run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
      - name: Commit and push changes
        run: |
         mv ./files/PandaGroovePG/*.zip .
-        git add .
-        git commit -m "Add unzipped files"
-     - name: Push changes to remote repository
-       uses: ad-m/github-push-action@master
-       with:
-          github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
-          branch: main
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"git add .
+        git commit -m "Add zip files"
+        git push -f -u origin main
