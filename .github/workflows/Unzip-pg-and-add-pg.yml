@@ -48,7 +48,7 @@ jobs:
        run: |
          unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
-       #if: ${{ env.commit }}
+       if: ${{ env.commit }}
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
