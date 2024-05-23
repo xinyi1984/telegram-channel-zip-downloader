@@ -38,7 +38,7 @@ jobs:
        id: find-downloaded-zip
        run: |
           # 查找下载的ZIP文件
-          DOWNLOADED_ZIP=$(ls /files/PandaGroovePG/*.zip 2>/dev/null)
+          DOWNLOADED_ZIP=$(ls ./files/PandaGroovePG/*.zip 2>/dev/null)
           if [[ -n "$DOWNLOADED_ZIP" ]]; then
             echo "::set-output name=downloaded-zip::${DOWNLOADED_ZIP##*/}" # 提取文件名
           else
@@ -50,7 +50,7 @@ jobs:
        id: find-repo-zip
        run: |
           # 查找仓库中的ZIP文件
-          REPO_ZIP=$(find . -type f -name "*.zip" | head -n 1) # 假设只有一个ZIP文件，或者取第一个作为比较对象
+          REPO_ZIP=$(find . -type f -name ".*.zip" | head -n 1) # 假设只有一个ZIP文件，或者取第一个作为比较对象
           if [[ -n "$REPO_ZIP" ]]; then
             echo "::set-output name=repo-zip::${REPO_ZIP##*/}" # 提取文件名
           else
