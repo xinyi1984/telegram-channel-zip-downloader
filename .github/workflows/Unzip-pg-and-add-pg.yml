@@ -109,8 +109,8 @@ jobs:
      - name: Commit and push changes
        if: ${{ steps.compare-filenames.outcome != 'success' }}
        run: |
-        rm -r ./pg*.zip
-        mv ./files/PandaGroovePG/*.zip ./pg
+        rm -r .*.zip
+        mv ./files/PandaGroovePG/*.zip .
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git add .
