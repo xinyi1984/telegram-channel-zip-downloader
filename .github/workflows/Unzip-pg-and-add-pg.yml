@@ -36,7 +36,7 @@ jobs:
        id: check-zip-existence
        run: |
           DOWNLOADED_ZIP="files/PandaGroovePG/*.zip"
-          REPOSITORY_ZIP="/*.zip" # Replace with the name of the ZIP file in your repository
+          REPOSITORY_ZIP="./*.zip" # Replace with the name of the ZIP file in your repository
 
           if [ -f "$REPOSITORY_ZIP" ]; then
             echo "ZIP file already exists in the repository, skipping further steps."
