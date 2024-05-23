@@ -44,7 +44,7 @@ jobs:
         python main.py
      
      - name: Unzip file
-       #if: ${{ env.commit }}
+       if: ${{ env.commit }}
        run: |
          unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
