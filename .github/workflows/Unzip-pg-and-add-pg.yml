@@ -87,4 +87,8 @@ jobs:
         cp ./files/PandaGroovePG/*.zip .
         git add .
         git commit -m "Add unzipped files"
-        git push origin ${{ github.ref }}
+     - name: Push changes to remote repository
+       uses: ad-m/github-push-action@master
+       with:
+          github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
+          branch: main
