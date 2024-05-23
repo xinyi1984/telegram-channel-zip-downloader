@@ -36,7 +36,7 @@ jobs:
      - name: Get current ZIP filename in repository
        id: get-zip-filename
        run: |
-          ZIP_FILE_NAME="pg.*.zip" # 替换为你的ZIP文件名
+          ZIP_FILE_NAME="pg.20240523-2055.zip" # 替换为你的ZIP文件名
           if [ -f "$ZIP_FILE_NAME" ]; then
             echo "::set-output name=zip_filename::$ZIP_FILE_NAME"
           else
