@@ -20,35 +20,28 @@ jobs:
     steps:
      - name: Checkout
        uses: actions/checkout@v1
-     
-     - name: Check New Commit
-       run: |
-          upStream=https://github.com/xinyi1984/xytv
-          echo "upStream=$upStream" >> $GITHUB_ENV
-          commit=$(curl -sL $upStream/commits/xytv |grep -o "/xinyi1984/xytv/commit/[a-z0-9]\+" |head -1 | cut -d\/ -f5)
-          if ! grep -q "$commit" README.md || [ "${{ inputs.rebuild }}" == "true" ]; then
-            echo "commit=$commit" >> $GITHUB_ENV
-            echo "commitS=${commit:0:7}" >> $GITHUB_ENV
-          fi
+       
      - name: Set up Python 3.9
-       #if: ${{ env.commit }}
        uses: actions/setup-python@v5
        with:
         python-version: 3.9 # 可以根据需要更改 Python 版本
      
      - name: telethon download telegram channel zip
-       #if: ${{ env.commit }}
        run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
      
      - name: Unzip file
-       #if: ${{ env.commit }}
        run: |
-         unzip -o files/PandaGroovePG/*.zip -d pg
+         if [ "./files/PandaGroovePG/*.zip" == "./*.zip" ]; then
+          echo "相同."
+          exit 0 # 跳过后续步骤
+         else
+         echo "不相同继续."
+          unzip -o files/PandaGroovePG/*.zip -d pg
+         fi
      - name: Add unzipped files pg to xytv
-       if: ${{ env.commit }}
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
@@ -59,7 +52,7 @@ jobs:
           rm -r xytv/README.txt
           rm -r xytv/*.zip
           mv ./pg/* xytv
-          mv ./files/PandaGroovePG/*.zip xytv
+          co ./files/PandaGroovePG/*.zip xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#https://mirror.ghproxy.com/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
           cd xytv
