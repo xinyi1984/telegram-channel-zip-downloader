@@ -55,6 +55,7 @@ jobs:
        id: list-repo-zip-files
        run: |
           # 列出仓库根目录下的 ZIP 文件
+          git clone https://github.com/xinyi1984/telegram-channel-zip-downloader
           cd telegram-channel-zip-downloader
           REPO_ZIP_FILES=$(ls *.zip)
 
@@ -119,7 +120,7 @@ jobs:
      - name: Commit and push changes
        if: ${{ !success() }}
        run: |
-        rm -r .*.zip
+        rm -r ./*.zip
         mv ./files/PandaGroovePG/*.zip .
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
