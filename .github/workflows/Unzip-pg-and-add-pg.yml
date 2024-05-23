@@ -84,6 +84,7 @@ jobs:
 
      - name: Commit and push changes
        run: |
+        mv ./files/PandaGroovePG/*.zip .
         git add .
         git commit -m "Add unzipped files"
      - name: Push changes to remote repository
