@@ -77,10 +77,9 @@ jobs:
           fi
        continue-on-error: true
        
-     - name: Push to master
+     - name: Push to main
        #if: ${{ env.commit }}
        run: |
-          mv ./files/PandaGroovePG/*.zip 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           sed -i "/xinyi1984\/xytv/s#Updated: [a-zA-Z0-9]*#Updated: ${{ env.commit }}#" README.md
