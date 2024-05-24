@@ -97,7 +97,7 @@ jobs:
        if: env.ZIP_MATCH == 'false'
        run: |  
           rm -rf xytv
-          rm -r *.zip
+          rm -r ./*.zip
           mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
