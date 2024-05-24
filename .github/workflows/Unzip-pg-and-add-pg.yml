@@ -28,6 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
+        echo "ZIP file is located at $(pwd)/pd.*.zip"  # 使用 pwd 命令打印当前工作目录
         
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
