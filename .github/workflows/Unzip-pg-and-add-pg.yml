@@ -90,19 +90,14 @@ jobs:
             git push -f -u origin master
           fi
        continue-on-error: true
-     - name: Commit and push changes
+     
+     - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
-       run: |
-        #rm -r xytv
-        rm -r ./*.zip
-        mv ./files/PandaGroovePG/*.zip .
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add .
-        git commit -m "Add zip files"
-     - name: Push changes to remote repository
-       if: env.ZIP_MATCH == 'false'
-       uses: ad-m/github-push-action@master
-       with:
-          github_token: ${{ secrets.GITHUBXYTV_TOKEN }}
-          branch: main
+       run: |  
+          rm -r ./*.zip
+          mv files/PandaGroovePG/*.zip .
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add *.zip
+          git commit -m "更新zip"
+          git push -f -u origin master
