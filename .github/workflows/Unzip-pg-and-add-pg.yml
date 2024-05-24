@@ -28,7 +28,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
-        echo "ZIP file is located at $(pwd)/pg.*.zip"  # 使用 pwd 命令打印当前工作目录
         
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
@@ -67,7 +66,7 @@ jobs:
        if: env.ZIP_MATCH == 'false'
        run: |  
           rm -r ./*.zip
-          mv telegram-channel-zip-downloader/*.zip .
+          mv telegram-channel-zip-downloader/files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add *.zip
