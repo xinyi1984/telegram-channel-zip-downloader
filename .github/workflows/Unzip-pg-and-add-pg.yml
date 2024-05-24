@@ -98,6 +98,7 @@ jobs:
      - name: Commit and push changes
        if: env.ZIP_MATCH == 'false'
        run: |
+        git rm --cached submodule-xytv
         rm -r ./*.zip
         mv ./files/PandaGroovePG/*.zip .
         git config --global user.name "github-actions[bot]"
