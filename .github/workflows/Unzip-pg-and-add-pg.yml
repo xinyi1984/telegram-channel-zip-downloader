@@ -67,7 +67,7 @@ jobs:
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
-       if: env.ZIP_MATCH == 'false'
+       if: env.ZIP_MATCH == 'true'
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
@@ -98,7 +98,7 @@ jobs:
      - name: Commit and push changes
        if: env.ZIP_MATCH == 'false'
        run: |
-        git rm --cached submodule-xytv
+        rm -r xytv
         rm -r ./*.zip
         mv ./files/PandaGroovePG/*.zip .
         git config --global user.name "github-actions[bot]"
