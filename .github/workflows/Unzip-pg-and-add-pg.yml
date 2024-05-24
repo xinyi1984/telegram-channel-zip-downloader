@@ -96,7 +96,7 @@ jobs:
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
        run: |  
-          #rm -r  xytv
+          rm -r  xytv
           rm -r ./*.zip
           mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
