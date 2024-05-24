@@ -1,7 +1,3 @@
-## Credits
-This repo relies on the following third-party projects:
-- [xinyi1984/xytv](https://github.com/xinyi1984/xytv) (Updated: a545c27b99b6d6d9e54196b8a0adcf3b56a97ddf)
-  
 # 概述：
 * 从 telegram 任意频道中下载该频道的全部历史视频。
 * 支持偏移查询，可以从某条消息开始执行。
