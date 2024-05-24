@@ -5,11 +5,6 @@ on:
   schedule:
     - cron: 15,45 0-18,22-23 * * *
   workflow_dispatch:
-    inputs:
-      rebuild:
-        description: '忽略构建记录以重新构建'
-        required: false
-        type: boolean
   
 jobs:
 
@@ -47,11 +42,11 @@ jobs:
           # 列出仓库中的所有ZIP文件
           zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
-
-     - name: Check if downloaded ZIP filename matches a file in the repository
+          
+     - name: Check if downloaded ZIP filename matches a file in the repository 
        id: check-match
        run: |
-          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配 
           downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
           zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
           if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
@@ -67,7 +62,7 @@ jobs:
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
      - name: Add unzipped files pg to xytv
-       if: env.ZIP_MATCH == 'true'
+       if: env.ZIP_MATCH == 'false'
        run: |
           git clone https://github.com/xinyi1984/xytv 
           rm -r xytv/js/*
@@ -98,7 +93,7 @@ jobs:
      - name: Commit and push changes
        if: env.ZIP_MATCH == 'false'
        run: |
-        rm -r xytv
+        #rm -r xytv
         rm -r ./*.zip
         mv ./files/PandaGroovePG/*.zip .
         git config --global user.name "github-actions[bot]"
