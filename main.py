@@ -1,8 +1,6 @@
 import time
 from telethon.sync import TelegramClient
 from telethon.tl.types import MessageMediaDocument
-import requests
-
 # ************************************************************
 #                       配置信息
 # ************************************************************
