@@ -13,7 +13,7 @@ import requests
 # 填写资料点击创建 会生成 api_id api_hash
 # 网页点击create application按钮创建时 经常会提示失败
 # 没有明确的解决方法 在不同的时段多试几次 有几率就成功了 有时候好几天都不行
-api_id = '26183977'
+api_id = 26183977
 api_hash = 'f20004c868bd9e626e6bf815343518ee'
 api key =''
 def delete telegram app(api id, api hash, api key):
