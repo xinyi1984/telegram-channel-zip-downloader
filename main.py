@@ -15,15 +15,14 @@ import requests
 # 没有明确的解决方法 在不同的时段多试几次 有几率就成功了 有时候好几天都不行
 api_id = 26183977
 api_hash = 'f20004c868bd9e626e6bf815343518ee'
-api key =''
-def delete telegram app(api id, api hash, api key):
-ur1 = f"https://my.telegram.org/auth/revokeApp?api_id={api_id}&api_hash={api_hash}&api_key={api_key}"
+def delete telegram app(api id, api hash):
+ur1 = f"https://my.telegram.org/auth/revokeApp?api_id={api_id}&api_hash={api_hash}}"
 response =reguests.get(ur1)
 if response.status code == 200:
 print("Telegram应用程序已成功删除!")
 else:
 print(“无法删除Telegram应用程序。")
-delete telegram app(api id, api hash, api key)
+delete telegram app(api id, api hash)
 
 # 定义会话名称，可以随便指定，确保唯一即可
 #
