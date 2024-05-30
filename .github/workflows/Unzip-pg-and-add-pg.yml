@@ -3,7 +3,7 @@ name: Unzip pg and add pg
 on:
   #push:
   schedule:
-    - cron: 0 */6 * * *
+    - cron: 15,45 0-18,22-23 * * *
   workflow_dispatch:
   
 jobs:
