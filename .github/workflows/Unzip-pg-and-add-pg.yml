@@ -78,6 +78,7 @@ jobs:
           cp ./files/PandaGroovePG/*.zip xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#https://mirror.ghproxy.com/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
+          sed -i "s#lib/quarkshare.txt#quarkshare.txt#g" xytv/jsm.json
           cd xytv
           if git diff --quiet; then
             echo "没有未提交的更改。"
