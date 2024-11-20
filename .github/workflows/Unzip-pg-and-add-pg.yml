@@ -66,6 +66,7 @@ jobs:
      - name: Add unzipped files pg to xytv
        if: env.ZIP_MATCH == 'false'
        run: |
+          rm -rf /tmp/*
           git clone https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
           rm -r xytv/lib/*
