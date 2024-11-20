@@ -65,8 +65,19 @@ jobs:
      - name: Add unzipped files pg to xytv
        if: env.ZIP_MATCH == 'false'
        run: |
-          df -h
-          git clone --depth 1 https://github.com/xinyi1984/xytv.git
+          rm -rf ~/.cache/pip
+          rm -rf installed_files
+          find /usr/local/lib/python3.9 -name '*.pyc' -delete
+          find /usr/local/lib/python3.9 -name '__pycache__' -type d -delete
+          rm -rf other_temp_dir
+          git clone https://github.com/xinyi1984/xytv.git 
+          rm -r xytv/js/*
+          rm -r xytv/lib/*
+          rm -r xytv/pg.jar
+          rm -r xytv/jsm.json
+          rm -r xytv/pg.jar.md5
+          rm -r xytv/README.txt
+          rm -r xytv/*.zip
           mv ./pg/* xytv
           cp ./files/PandaGroovePG/*.zip xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#./json/market.json#g" xytv/jsm.json
