@@ -61,34 +61,14 @@ jobs:
        if: env.ZIP_MATCH == 'false'
        run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
-              
-     - name: Invalidate cache
-       uses: actions/cache@v3
-       with:
-         path: |
-           path/to/cached/files
-         key: ${{ runner.os }}-new-cache-key
          
      - name: Add unzipped files pg to xytv
        if: env.ZIP_MATCH == 'false'
        run: |
-          rm -rf ~/.cache/pip
-          rm -rf /home/user/Downloads/*
-          git gc
-          git clone https://github.com/xinyi1984/xytv.git 
-          rm -r xytv/js/*
-          rm -r xytv/lib/*
-          rm -r xytv/pg.jar
-          rm -r xytv/jsm.json
-          rm -r xytv/pg.jar.md5
-          rm -r xytv/README.txt
-          rm -r xytv/*.zip
-          mv ./pg/* xytv
-          cp ./files/PandaGroovePG/*.zip xytv
-          sed -i "s#https://fm.t4tv.hz.cz/json/market.json#./json/market.json#g" xytv/jsm.json
-          sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
-          sed -i "s#lib/quarkshare.txt#quarkshare.txt#g" xytv/jsm.json
-          cd xytv
+          mv ./pg/* .
+          sed -i "s#https://fm.t4tv.hz.cz/json/market.json#./json/market.json#g" ./jsm.json
+          sed -i "s#lib/alishare.txt#alishare.txt#g" ./jsm.json
+          sed -i "s#lib/quarkshare.txt#quarkshare.txt#g" ./jsm.json
           if git diff --quiet; then
             echo "没有未提交的更改。"
           else
