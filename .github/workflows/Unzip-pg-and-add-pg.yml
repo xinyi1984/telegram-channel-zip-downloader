@@ -67,8 +67,6 @@ jobs:
        run: |
           rm -rf ~/.cache/pip
           rm -rf installed_files
-          find /usr/local/lib/python3.9 -name '*.pyc' -delete
-          find /usr/local/lib/python3.9 -name '__pycache__' -type d -delete
           rm -rf other_temp_dir
           git clone https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
