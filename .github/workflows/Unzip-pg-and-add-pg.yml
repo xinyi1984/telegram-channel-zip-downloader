@@ -66,8 +66,9 @@ jobs:
        if: env.ZIP_MATCH == 'false'
        run: |
           rm -rf ~/.cache/pip
-          rm -rf installed_files
-          rm -rf other_temp_dir
+          rm -rf /home/user/Downloads/*
+          rm -rf /tmp/*
+          git gc
           git clone https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
           rm -r xytv/lib/*
