@@ -56,18 +56,27 @@ jobs:
             echo "ZIP filename does not match any file in the repository."
             echo "ZIP_MATCH=false" >> $GITHUB_ENV
           fi
+       
+     - name: Upload zip To telegram-channel-zip-downloader
+       if: env.ZIP_MATCH == 'false'
+       run: |  
+          rm -rf  xytv
+          rm -r ./*.zip
+          mv ./files/PandaGroovePG/*.zip .
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "更新zip"
+          git push -f -u origin main
       
      - name: Unzip file
        if: env.ZIP_MATCH == 'false'
        run: |
-          unzip -o files/PandaGroovePG/*.zip -d pg
-     
-          
+          unzip -o ./*.zip -d pg
+              
      - name: Add unzipped files pg to xytv
        if: env.ZIP_MATCH == 'false'
        run: |
-          rm -rf temp_data
-          git gc --prune=now
           git clone https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
           rm -r xytv/lib/*
@@ -95,15 +104,3 @@ jobs:
             git push -f -u origin master
           fi
        continue-on-error: true
-       
-     - name: Upload zip To telegram-channel-zip-downloader
-       if: env.ZIP_MATCH == 'false'
-       run: |  
-          rm -rf  xytv
-          rm -r ./*.zip
-          mv ./files/PandaGroovePG/*.zip .
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "更新zip"
-          git push -f -u origin main
