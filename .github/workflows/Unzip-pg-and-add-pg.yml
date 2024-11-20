@@ -67,7 +67,6 @@ jobs:
        run: |
           rm -rf ~/.cache/pip
           rm -rf /home/user/Downloads/*
-          rm -rf /tmp/*
           git gc
           git clone https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
@@ -102,6 +101,7 @@ jobs:
        run: |  
           rm -rf  xytv
           rm -r ./*.zip
+          rm -r ./pg
           mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
