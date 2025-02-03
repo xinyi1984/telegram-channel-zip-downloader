@@ -24,7 +24,7 @@ api_hash = os.getenv('TELEGRAM_API_HASH')
 session = 'session'
 
 # 消息偏移点 id，表示从哪一条消息开始下载，可以忽略之前已经处理过的消息
-offset_id = 318
+offset_id = 1200
 
 # 每次查询的消息数量
 message_limit = 1
