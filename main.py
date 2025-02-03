@@ -21,7 +21,7 @@ api_hash = os.getenv('TELEGRAM_API_HASH')
 # 然后telegram会给你的网页版发一条验证码消息
 # 将验证码输入到控制台 创建session文件
 # 有了session文件以后 不要删除 下一次就可以直接启动不需要进行验证了
-session = 'session'
+session = os.getenv('TELEGRAM_SESSION')
 
 # 消息偏移点 id，表示从哪一条消息开始下载，可以忽略之前已经处理过的消息
 offset_id = 318
