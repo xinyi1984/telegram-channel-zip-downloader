@@ -12,8 +12,8 @@
 
 # 安装方法
 ```
-$ git clone https://github.com/mexcmoe/telegram-channel-video-downloader.git
-$ cd telegram-channel-video-downloader
+$ git clone https://github.com/xinyi1984/telegram-channel-zip-downloader.git
+$ cd telegram-channel-zip-downloader
 $ pip install -r requirements.txt
 ```
 
