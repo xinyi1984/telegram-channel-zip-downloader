@@ -1,3 +1,4 @@
+import os
 import time
 from telethon.sync import TelegramClient
 from telethon.tl.types import MessageMediaDocument
