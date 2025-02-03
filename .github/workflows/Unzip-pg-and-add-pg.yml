@@ -3,7 +3,8 @@ name: Unzip pg and add pg
 on:
   #push:
   schedule:
-    - cron: 15,45 0-18,22-23 * * *
+    - cron: '0 */8 * * *'
+# 这里默认24小时内执行3次
   workflow_dispatch:
   
 jobs:
