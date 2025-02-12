@@ -36,41 +36,29 @@ jobs:
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
        run: |
-          # 检查目标目录是否存在 ZIP 文件
-          if [ -z "$(ls -A ./files/juejijianghu/*.zip 2>/dev/null)" ]; then
-            echo "错误：未找到任何 ZIP 文件。"
-            exit 1
-          fi
-
-          # 使用 find 命令获取 ZIP 文件名
-          downloaded_zip_name=$(find ./files/juejijianghu -name "*.zip" | head -n 1)
-          if [ -z "$downloaded_zip_name" ]; then
-            echo "错误：未找到任何 ZIP 文件。"
-            exit 1
-          fi
+          # 获取下载的ZIP文件名
+          downloaded_zip_name=$(ls ./files/juejijianghu/*.zip | head -n 1)
           echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
-
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-          # 检查当前目录是否是 Git 仓库
-          if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-            echo "错误：当前目录不是 Git 仓库。"
-            exit 1
-          fi
-
-          # 列出仓库中的所有 ZIP 文件
-          echo "Debug: Running git ls-tree..."
-          git ls-tree -r --name-only HEAD
-
-          echo "Debug: Filtering ZIP files..."
-          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$' || true)
-          echo "Debug: zip_files = $zip_files"
-
-          if [ -z "$zip_files" ]; then
-            echo "警告：仓库中没有 ZIP 文件。"
-          fi
+          # 列出仓库中的所有ZIP文件
+          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
+          
+     - name: Check if downloaded ZIP filename matches a file in the repository 
+       id: check-match
+       run: |
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配 
+          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
+          zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
+          if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
+            echo "ZIP filename matches a file in the repository."
+            echo "ZIP_MATCH=true" >> $GITHUB_ENV
+          else
+            echo "ZIP filename does not match any file in the repository."
+            echo "ZIP_MATCH=false" >> $GITHUB_ENV
+          fi
       
      - name: Unzip file
        if: env.ZIP_MATCH == 'false'
