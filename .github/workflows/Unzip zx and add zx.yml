@@ -72,15 +72,15 @@ jobs:
        if: env.ZIP_MATCH == 'false'
        run: |
           git clone --depth 5 --branch zx https://github.com/xinyi1984/xytv.git 
-          rm -r xytv/zx/json/*
-          rm -r xytv/zx/lib/*
-          rm -r xytv/zx/custom_spider.jar
-          rm -r xytv/zx/FongMi.json
-          rm -r xytv/zx/readme-tg.txt
-          rm -r xytv/zx/readme.txt
-          rm -r xytv/zx/*.zip
-          mv ./zx/* xytv/zx
-          cp ./files/juejijianghu/*.zip xytv/zx
+          rm -r xytv/json/*
+          rm -r xytv/lib/*
+          rm -r xytv/custom_spider.jar
+          rm -r xytv/FongMi.json
+          rm -r xytv/readme-tg.txt
+          rm -r xytv/readme.txt
+          rm -r xytv/*.zip
+          mv ./zx/* xytv
+          cp ./files/juejijianghu/*.zip xytv
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\"},#g" xytv/FongMi.json
           cd xytv/zx
           if git diff --quiet; then
@@ -92,7 +92,7 @@ jobs:
             git add --all
             git remote rm origin
             git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
-            git commit -m "更新FongMi Add unzipped files to xytv/zx"
+            git commit -m "更新FongMi Add unzipped files to xytv"
             git push -f -u origin zx
           fi
        continue-on-error: true
