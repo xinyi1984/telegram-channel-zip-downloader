@@ -36,31 +36,12 @@ jobs:
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
        run: |
-         # 设置字符编码为 UTF - 8，确保中文文件名能正确处理
-         export LC_ALL=en_US.UTF-8
-         # 定义下载 ZIP 文件所在的目录
-        DOWNLOAD_DIR="./files/juejijianghu"
-         # 查找下载的 ZIP 文件
-         find_downloaded_zip() {
-           shopt -s nullglob
-           local zip_files=("$DOWNLOAD_DIR"/*.zip)
-           if [ ${#zip_files[@]} -eq 0 ]; then
-             return 1
-           fi
-           echo "${zip_files[0]}"
-         }
-        downloaded_zip_name=$(find_downloaded_zip)
-         if [ $? -ne 0 ]; then
-           echo "错误：在 $DOWNLOAD_DIR 目录下未找到下载的 ZIP 文件。" >&2
-           exit 1
-         fi
-         echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
-         echo "成功获取下载的 ZIP 文件：$downloaded_zip_name"
+          # 获取下载的ZIP文件名
+          downloaded_zip_name=$(ls ./files/PandaGroovePG/*.zip | head -n 1)
+          echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-         # 设置字符编码为 UTF - 8
-         export LC_ALL=en_US.UTF-8
          # 检查当前目录是否为 Git 仓库
          is_git_repo() {
            git rev-parse --is-inside-work-tree > /dev/null 2>&1
@@ -71,7 +52,7 @@ jobs:
          fi
          # 列出仓库中的所有 ZIP 文件
          list_repo_zip_files() {
-           local raw_zip_files=$(git ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
+           local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
            # 使用 iconv 确保编码转换
            local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
            echo "$decoded_zip_files"
@@ -83,48 +64,25 @@ jobs:
          else
            echo "仓库中的 ZIP 文件列表（解码后）:"
            echo "$zip_files"
-           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
+           # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
+           escaped_zip_files=$(printf "%q" "$zip_files")
+           echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
          fi
-     - name: Check if downloaded ZIP filename matches a file in the repository
+     - name: Check if downloaded ZIP filename matches a file in the repository 
        id: check-match
        run: |
-         # 设置字符编码为 UTF - 8
-         export LC_ALL=en_US.UTF-8
-         # 检查下载的 ZIP 文件名是否匹配仓库中的文件
-         check_zip_match() {
-           local downloaded_name="${1##*/}"
-           local repo_files="$2"
-           while IFS= read -r repo_file; do
-             local repo_file_name="${repo_file##*/}"
-             # 统一转换为小写进行比较，避免大小写问题
-             if [ "${repo_file_name,,}" = "${downloaded_name,,}" ]; then
-               echo "true"
-              return 0
-             fi
-           done <<< "$repo_files"
-           echo "false"
-         }
-         if [ -z "${DOWNLOADED_ZIP_NAME:-}" ]; then
-           echo "错误：未获取到下载的 ZIP 文件名。" >&2
-           exit 1
-         fi
-         downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
-         echo "下载的 ZIP 文件名: $downloaded_zip_name"
-         zip_files="${ZIP_FILES:-}"
-         if [ -z "$zip_files" ]; then
-           echo "ZIP 文件名不存在于仓库中，因为仓库中没有 ZIP 文件。"
-           echo "ZIP_MATCH=false" >> $GITHUB_ENV
-         else
-           match_result=$(check_zip_match "$DOWNLOADED_ZIP_NAME" "$zip_files")
-           if [ "$match_result" = "true" ]; then
-             echo "ZIP 文件名已存在于仓库中，跳过后续操作。"
-             echo "ZIP_MATCH=true" >> $GITHUB_ENV
-             exit 0
-           else
-            echo "ZIP 文件名不存在于仓库中。"
-             echo "ZIP_MATCH=false" >> $GITHUB_ENV
-           fi
-         fi
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配 
+          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
+          zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
+          if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
+            echo "下载的 ZIP 文件名: $downloaded_zip_name"
+            echo "ZIP 文件名已存在于仓库中"
+            echo "ZIP_MATCH=true" >> $GITHUB_ENV
+          else
+            echo "下载的 ZIP 文件名: $downloaded_zip_name"
+            echo "ZIP 文件名不存在于仓库中"
+            echo "ZIP_MATCH=false" >> $GITHUB_ENV
+          fi
       
      - name: Unzip file
        if: env.ZIP_MATCH == 'false'
