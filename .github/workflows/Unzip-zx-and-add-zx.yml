@@ -57,20 +57,32 @@ jobs:
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-         set -euo pipefail
+         # 设置字符编码为 UTF - 8
          export LC_ALL=en_US.UTF-8
-    
-         # 使用 Git 原生命令快速获取 ZIP 列表
-         if ! git ls-tree -r --name-only HEAD | grep -q '\.zip$'; then
-           echo "ZIP_FILES=" >> $GITHUB_ENV
-           echo "::warning::仓库中未找到 ZIP 文件"
-           exit 0
+         # 检查当前目录是否为 Git 仓库
+         is_git_repo() {
+           git rev-parse --is-inside-work-tree > /dev/null 2>&1
+         }
+         if ! is_git_repo; then
+           echo "错误：当前目录不是 Git 仓库。" >&2
+           exit 1
          fi
-    
-         zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$' | awk '{printf "• %s\n", $0}')
-         echo "ZIP_FILES=${zip_files//$'\n'/%0A}" >> $GITHUB_ENV  # 处理多行输出
-         echo "仓库 ZIP 文件列表:"
-         echo "$zip_files"
+         # 列出仓库中的所有 ZIP 文件
+         list_repo_zip_files() {
+           local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
+           # 使用 iconv 确保编码转换
+           local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
+           echo "$decoded_zip_files"
+         }
+         zip_files=$(list_repo_zip_files)
+         if [ -z "$zip_files" ]; then
+           echo "警告：仓库中没有 ZIP 文件。"
+           echo "ZIP_FILES=" >> $GITHUB_ENV
+         else
+           echo "仓库中的 ZIP 文件列表（解码后）:"
+           echo "$zip_files"
+           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
+         fi
 
      - name: Check filename match
        id: check-match
