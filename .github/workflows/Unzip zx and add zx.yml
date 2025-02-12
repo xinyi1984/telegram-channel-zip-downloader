@@ -82,7 +82,7 @@ jobs:
           mv ./zx/* xytv/zx
           cp ./files/juejijianghu/*.zip xytv/zx
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\"},#g" xytv/FongMi.json
-          cd zx
+          cd xytv/zx
           if git diff --quiet; then
             echo "没有未提交的更改。"
           else
