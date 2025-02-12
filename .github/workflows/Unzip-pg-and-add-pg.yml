@@ -38,7 +38,6 @@ jobs:
        run: |
           # 获取下载的ZIP文件名
           downloaded_zip_name=$(ls ./files/PandaGroovePG/*.zip | head -n 1)
-          downloaded_zip_name=$(ls ./files/juejijianghu/*.zip | head -n 1)
           echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
 
      - name: List ZIP files in the repository
