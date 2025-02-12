@@ -30,7 +30,6 @@ offset_id = 1200
 message_limit = 1
 # 想要下载的频道用户名，如果频道地址是 https://t.me/abc，那么频道名称为 "abc"
 channel_username = 'PandaGroovePG'
-channel_username = 'juejijianghu'
 # ************************************************************
 #                       配置结束
 # ************************************************************
