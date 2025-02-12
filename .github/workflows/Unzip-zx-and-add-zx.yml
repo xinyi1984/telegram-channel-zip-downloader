@@ -60,8 +60,13 @@ jobs:
          else
            echo "仓库中的ZIP文件列表（原始）:"
            echo "$zip_files"
+           # 对 ZIP 文件列表进行解码
+           decoded_zip_files=$(echo -e "$zip_files")
+           echo "仓库中的ZIP文件列表（解码后）:"
+           echo "$decoded_zip_files"
+           # 将解码后的文件列表存入环境变量
+           echo "ZIP_FILES=$decoded_zip_files" >> $GITHUB_ENV
          fi
-         echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
      - name: Check if downloaded ZIP filename matches a file in the repository
        id: check-match
        run: |
