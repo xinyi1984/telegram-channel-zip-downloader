@@ -37,7 +37,7 @@ jobs:
        id: get-zip-name
        run: |
           # 检查目标目录是否存在 ZIP 文件
-          if [ -z "$(ls -A ./files/PandaGroovePG/*.zip 2>/dev/null)" ]; then
+          if [ -z "$(ls -A ./files/juejijianghu/*.zip 2>/dev/null)" ]; then
             echo "错误：未找到任何 ZIP 文件。"
             exit 1
           fi
