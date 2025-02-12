@@ -92,7 +92,7 @@ jobs:
             git add --all
             git remote rm origin
             git remote add origin "https://xytv:${{ secrets.GITHUBXYTV_TOKEN }}@github.com/xinyi1984/xytv"
-            git commit -m "更新FongMi Add unzipped files to xytv"
+            git commit -m "更新FongMi Add unzipped files to zx"
             git push -f -u origin zx
           fi
        continue-on-error: true
