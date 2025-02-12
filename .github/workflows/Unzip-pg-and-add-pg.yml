@@ -111,7 +111,7 @@ jobs:
        if: env.ZIP_MATCH == 'false'
        run: |  
           rm -rf  xytv
-          rm -r ./pg.*.zip
+          rm -r ./pg*.zip
           rm -r ./pg
           mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
