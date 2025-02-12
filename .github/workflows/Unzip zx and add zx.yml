@@ -42,8 +42,11 @@ jobs:
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-          # 列出仓库中的所有ZIP文件
+          # 列出仓库中的所有 ZIP 文件
           zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
+          if [ -z "$zip_files" ]; then
+          echo "警告：仓库中没有 ZIP 文件。"
+          fi
           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
           
      - name: Check if downloaded ZIP filename matches a file in the repository 
