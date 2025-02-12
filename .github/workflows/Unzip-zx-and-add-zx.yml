@@ -48,15 +48,16 @@ jobs:
             exit 1
           fi
           # 列出仓库中的所有 ZIP 文件
-          echo "Debug: Running git ls-tree..."
-          git ls-tree -r --name-only HEAD
-          echo "Debug: Filtering ZIP files..."
-          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$' || true)
-          echo "Debug: zip_files = $zip_files"
-          if [ -z "$zip_files" ]; then
+          echo "Debug: Running git ls-files..."
+          zip_files=$(git ls-files | grep '\.zip$' || true)
+          # 解码文件名中的转义字符
+          decoded_zip_files=$(echo -e "$zip_files")
+          echo "Debug: decoded_zip_files = $decoded_zip_files"
+          if [ -z "$decoded_zip_files" ]; then
             echo "警告：仓库中没有 ZIP 文件。"
           fi
-          echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
+          # 将 ZIP 文件列表存储到环境变量中
+          echo "ZIP_FILES=$decoded_zip_files" >> $GITHUB_ENV
      - name: Check if downloaded ZIP filename matches a file in the repository 
        id: check-match
        run: |
