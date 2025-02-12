@@ -36,16 +36,12 @@ jobs:
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
        run: |
-         # 设置字符编码为 UTF-8
-         export LC_ALL=en_US.UTF-8
          # 获取下载的ZIP文件名
          downloaded_zip_name=$(ls ./files/PandaGroovePG/*.zip | head -n 1)
          echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-         # 设置字符编码为 UTF-8
-         export LC_ALL=en_US.UTF-8
          # 检查当前目录是否是 Git 仓库
          if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
            echo "错误：当前目录不是 Git 仓库。"
@@ -61,19 +57,22 @@ jobs:
            echo "警告：仓库中没有 ZIP 文件。"
          fi
          echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
-     - name: Check if downloaded ZIP filename matches a file in the repository 
+     - name: Check if downloaded ZIP filename matches a file in the repository
        id: check-match
        run: |
-         # 设置字符编码为 UTF-8
-         export LC_ALL=en_US.UTF-8
-         # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配 
+         # 提取下载的 ZIP 文件名（去掉路径）
          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
-         zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
-         if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
-           echo "ZIP 文件名与仓库中的一个文件匹配。"
+         echo "下载的 ZIP 文件名: $downloaded_zip_name"
+         # 将 ZIP_FILES 中的转义字符解码为原始的中文字符
+         decoded_zip_files=$(echo -e "$ZIP_FILES")
+         echo "仓库中的 ZIP 文件列表（解码后）:"
+         echo "$decoded_zip_files"
+         # 检查下载的 ZIP 文件名是否与仓库中的 ZIP 文件名匹配
+         if echo "$decoded_zip_files" | grep -qF -- "$downloaded_zip_name"; then
+           echo "ZIP 文件名已存在于仓库中。"
            echo "ZIP_MATCH=true" >> $GITHUB_ENV
          else
-           echo "ZIP 文件名与仓库中的任何文件都不匹配。"
+           echo "ZIP 文件名不存在于仓库中。"
            echo "ZIP_MATCH=false" >> $GITHUB_ENV
          fi
       
