@@ -43,7 +43,7 @@ jobs:
        id: list-zip-files
        run: |
           # 列出仓库中的所有 ZIP 文件
-          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
+          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$' || true)
           if [ -z "$zip_files" ]; then
           echo "警告：仓库中没有 ZIP 文件。"
           fi
