@@ -42,11 +42,8 @@ jobs:
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-          # 列出仓库中的所有 ZIP 文件
-          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$' || true)
-          if [ -z "$zip_files" ]; then
-          echo "警告：仓库中没有 ZIP 文件。"
-          fi
+          # 列出仓库中的所有ZIP文件
+          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
           
      - name: Check if downloaded ZIP filename matches a file in the repository 
@@ -82,7 +79,7 @@ jobs:
           mv ./zx/* xytv
           cp ./files/juejijianghu/*.zip xytv
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\"},#g" xytv/FongMi.json
-          cd xytv/zx
+          cd xytv
           if git diff --quiet; then
             echo "没有未提交的更改。"
           else
