@@ -70,10 +70,10 @@ jobs:
          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
          zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
          if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
-           echo "ZIP filename matches a file in the repository."
+           echo "ZIP 文件名与仓库中的一个文件匹配。"
            echo "ZIP_MATCH=true" >> $GITHUB_ENV
          else
-           echo "ZIP filename does not match any file in the repository."
+           echo "ZIP 文件名与仓库中的任何文件都不匹配。"
            echo "ZIP_MATCH=false" >> $GITHUB_ENV
          fi
       
