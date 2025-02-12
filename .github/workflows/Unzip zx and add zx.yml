@@ -42,8 +42,20 @@ jobs:
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-          # 列出仓库中的所有ZIP文件
-          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$')
+          # 检查当前目录是否是 Git 仓库
+          if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+            echo "错误：当前目录不是 Git 仓库。"
+            exit 1
+          fi
+          # 列出仓库中的所有 ZIP 文件
+          echo "Debug: Running git ls-tree..."
+          git ls-tree -r --name-only HEAD
+          echo "Debug: Filtering ZIP files..."
+          zip_files=$(git ls-tree -r --name-only HEAD | grep '\.zip$' || true)
+          echo "Debug: zip_files = $zip_files"
+          if [ -z "$zip_files" ]; then
+            echo "警告：仓库中没有 ZIP 文件。"
+          fi
           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
           
      - name: Check if downloaded ZIP filename matches a file in the repository 
