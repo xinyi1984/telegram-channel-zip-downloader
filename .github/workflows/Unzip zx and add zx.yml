@@ -43,7 +43,7 @@ jobs:
           fi
 
           # 使用 find 命令获取 ZIP 文件名
-          downloaded_zip_name=$(find ./files/PandaGroovePG -name "*.zip" | head -n 1)
+          downloaded_zip_name=$(find ./files/juejijianghu -name "*.zip" | head -n 1)
           if [ -z "$downloaded_zip_name" ]; then
             echo "错误：未找到任何 ZIP 文件。"
             exit 1
