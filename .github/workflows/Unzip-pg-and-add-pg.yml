@@ -100,11 +100,13 @@ jobs:
           rm -r xytv/pg.jar.md5
           rm -r xytv/README.txt
           rm -r xytv/*.zip
+          # 重命名 pg/lib/tokentemplate.json 为 pg/lib/tokentem.json
+          mv pg/lib/tokentemplate.json pg/lib/tokentem.json
           mv ./pg/* xytv
           cp ./files/PandaGroovePG/*.zip xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#./json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
-          sed -i "s#lib/tokenm.json#lib/tokentemplate.json#g" xytv/jsm.json
+          # sed -i "s#lib/tokenm.json#lib/tokentemplate.json#g" xytv/jsm.json
           sed -i "s#lib/quarkshare.txt#quarkshare.txt#g" xytv/jsm.json
           cd xytv
           if git diff --quiet; then
