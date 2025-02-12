@@ -65,7 +65,9 @@ jobs:
          else
            echo "仓库中的 ZIP 文件列表（解码后）:"
            echo "$zip_files"
-           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
+           # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
+           escaped_zip_files=$(printf "%q" "$zip_files")
+           echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
          fi
           
      - name: Check if downloaded ZIP filename matches a file in the repository 
