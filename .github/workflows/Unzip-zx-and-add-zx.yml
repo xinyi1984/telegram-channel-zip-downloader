@@ -77,10 +77,12 @@ jobs:
           downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
           zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
           if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
-            echo "ZIP filename matches a file in the repository."
+            echo "下载的 ZIP 文件名: $downloaded_zip_name"
+            echo "ZIP 文件名已存在于仓库中"
             echo "ZIP_MATCH=true" >> $GITHUB_ENV
           else
-            echo "ZIP filename does not match any file in the repository."
+            echo "下载的 ZIP 文件名: $downloaded_zip_name"
+            echo "ZIP 文件名不存在于仓库中"
             echo "ZIP_MATCH=false" >> $GITHUB_ENV
           fi
       
