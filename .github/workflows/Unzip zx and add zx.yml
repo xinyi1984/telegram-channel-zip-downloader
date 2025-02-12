@@ -57,7 +57,6 @@ jobs:
             echo "警告：仓库中没有 ZIP 文件。"
           fi
           echo "ZIP_FILES=$zip_files" >> $GITHUB_ENV
-          
      - name: Check if downloaded ZIP filename matches a file in the repository 
        id: check-match
        run: |
