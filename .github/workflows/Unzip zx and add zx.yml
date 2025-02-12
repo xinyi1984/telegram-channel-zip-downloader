@@ -68,21 +68,21 @@ jobs:
        run: |
           unzip -o files/juejijianghu/*.zip -d zx
          
-     - name: Add unzipped files zx to xytv
+     - name: Add unzipped files zx to zx
        if: env.ZIP_MATCH == 'false'
        run: |
           git clone --depth 5 --branch zx https://github.com/xinyi1984/xytv.git 
-          rm -r xytv/json/*
-          rm -r xytv/lib/*
-          rm -r xytv/custom_spider.jar
-          rm -r xytv/FongMi.json
-          rm -r xytv/readme-tg.txt
-          rm -r xytv/readme.txt
-          rm -r xytv/*.zip
-          mv ./zx/* xytv
-          cp ./files/juejijianghu/*.zip xytv
+          rm -r zx/json/*
+          rm -r zx/lib/*
+          rm -r zx/custom_spider.jar
+          rm -r zx/FongMi.json
+          rm -r zx/readme-tg.txt
+          rm -r zx/readme.txt
+          rm -r zx/*.zip
+          mv ./zx/* zx
+          cp ./files/juejijianghu/*.zip zx
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\"},#g" xytv/FongMi.json
-          cd xytv
+          cd zx
           if git diff --quiet; then
             echo "没有未提交的更改。"
           else
@@ -100,7 +100,7 @@ jobs:
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
        run: |  
-          rm -rf  xytv
+          rm -rf  zx
           rm -r ./真心*.zip
           rm -r ./zx
           mv ./files/juejijianghu/*.zip .
