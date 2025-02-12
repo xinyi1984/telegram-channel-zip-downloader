@@ -108,7 +108,7 @@ jobs:
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
        run: |  
-          rm -rf  zx
+          rm -rf  xytv
           rm -r ./真心*.zip
           rm -r ./zx
           mv ./files/juejijianghu/*.zip .
