@@ -64,9 +64,12 @@ jobs:
          # 提取下载的 ZIP 文件名（去掉路径）
          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
          echo "下载的 ZIP 文件名: $downloaded_zip_name"
-
-         # 使用 git ls-files 列出仓库中的 ZIP 文件并匹配
-         if git ls-files | grep -qF -- "$downloaded_zip_name"; then
+         # 将 ZIP_FILES 中的转义字符解码为原始的中文字符
+         decoded_zip_files=$(echo -e "$ZIP_FILES")
+         echo "仓库中的 ZIP 文件列表（解码后）:"
+         echo "$decoded_zip_files"
+         # 检查下载的 ZIP 文件名是否与仓库中的 ZIP 文件名匹配
+         if echo "$decoded_zip_files" | grep -qF -- "$downloaded_zip_name"; then
            echo "ZIP 文件名已存在于仓库中。"
            echo "ZIP_MATCH=true" >> $GITHUB_ENV
          else
