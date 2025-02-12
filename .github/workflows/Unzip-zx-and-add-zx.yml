@@ -32,28 +32,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python zx.py
-        
-     - name: Get the name of the downloaded ZIP file
-       id: get-zip-name
-       run: |
-         set -euo pipefail
-         export LC_ALL=en_US.UTF-8
-         DOWNLOAD_DIR="./files/juejijianghu"
-    
-         # 检查 ZIP 文件数量（严格模式）
-         shopt -s nullglob
-         zip_files=("$DOWNLOAD_DIR"/*.zip)
-         if (( ${#zip_files[@]} == 0 )); then
-           echo "::error::未找到 ZIP 文件: $DOWNLOAD_DIR"
-           exit 1
-         elif (( ${#zip_files[@]} > 1 )); then
-           echo "::error::发现多个 ZIP 文件: ${zip_files[*]}"
-           exit 1
-         fi
-
-         echo "DOWNLOADED_ZIP_NAME=${zip_files[0]}" >> $GITHUB_ENV
-         echo "成功获取 ZIP 文件: ${zip_files[0]##*/}"
-
+     
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
        run: |
