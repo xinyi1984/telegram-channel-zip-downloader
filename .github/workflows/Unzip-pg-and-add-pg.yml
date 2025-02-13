@@ -100,7 +100,7 @@ jobs:
           rm -r xytv/pg.jar.md5
           rm -r xytv/README.txt
           rm -r xytv/*.zip
-          rm -r xytv/json/wex.json
+          #rm -r xytv/json/wex.json
           # 重命名 pg/lib/tokentemplate.json 为 pg/lib/tokenm.json
           mv pg/lib/tokentemplate.json pg/lib/tokenm.json
           mv ./pg/* xytv
