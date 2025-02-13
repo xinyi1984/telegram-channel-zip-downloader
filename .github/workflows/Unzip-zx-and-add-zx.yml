@@ -102,7 +102,7 @@ jobs:
           rm -r xytv/*.zip
           mv ./zx/* xytv
           cp ./files/juejijianghu/*.zip xytv
-          sed -i "s#http://127.0.0.1:35457#http://127.0.0.1:35456#g" xytv/FongMi.json
+          sed -i "s#http://127.0.0.1:35457#http://127.0.0.1:10079/c/3600/null/http://127.0.0.1:35456#g" xytv/FongMi.json
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" xytv/FongMi.json
           cd xytv
           if git diff --quiet; then
