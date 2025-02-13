@@ -90,7 +90,7 @@ jobs:
           unzip -o files/PandaGroovePG/*.zip -d pg
          
      - name: Add unzipped files pg to xytv
-       if: env.ZIP_MATCH == 'false'
+       #if: env.ZIP_MATCH == 'false'
        run: |
           git clone --depth 5 https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
@@ -106,7 +106,7 @@ jobs:
           mv ./pg/* xytv
           cp ./files/PandaGroovePG/*.zip xytv
           # 下载 wex.json 文件
-          curl -o wex.json https://9280.kstore.space/wex.json
+          wget -O wex.json https://9280.kstore.space/wex.json
           # wex.json 插入应用商店
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" wex.json
           # 将下载的 wex.json 复制到 xytv/json 目录
