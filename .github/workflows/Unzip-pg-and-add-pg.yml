@@ -32,48 +32,52 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python main.py
-        
+
      - name: Get the name of the downloaded ZIP file
        id: get-zip-name
        run: |
           # 获取下载的ZIP文件名
-          downloaded_zip_name=$(ls ./files/PandaGroovePG/*.zip | head -n 1)
+          downloaded_zip_name=$(ls ./files/juejijianghu/*.zip | head -n 1)
+          downloaded_zip_name=$(basename "$downloaded_zip_name")
           echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
+          echo "下载的 ZIP 文件名: $downloaded_zip_name"
+
      - name: List ZIP files in the repository
        id: list-zip-files
        run: |
-         # 检查当前目录是否为 Git 仓库
-         is_git_repo() {
-           git rev-parse --is-inside-work-tree > /dev/null 2>&1
-         }
-         if ! is_git_repo; then
-           echo "错误：当前目录不是 Git 仓库。" >&2
-           exit 1
-         fi
-         # 列出仓库中的所有 ZIP 文件
-         list_repo_zip_files() {
-           local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
-           # 使用 iconv 确保编码转换
-           local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
-           echo "$decoded_zip_files"
-         }
-         zip_files=$(list_repo_zip_files)
-         if [ -z "$zip_files" ]; then
-           echo "警告：仓库中没有 ZIP 文件。"
-           echo "ZIP_FILES=" >> $GITHUB_ENV
-         else
-           echo "仓库中的 ZIP 文件列表（解码后）:"
-           echo "$zip_files"
-           # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
-           escaped_zip_files=$(printf "%q" "$zip_files")
-           echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
-         fi
-     - name: Check if downloaded ZIP filename matches a file in the repository 
+          # 检查当前目录是否为 Git 仓库
+          is_git_repo() {
+            git rev-parse --is-inside-work-tree > /dev/null 2>&1
+          }
+          if ! is_git_repo; then
+            echo "错误：当前目录不是 Git 仓库。" >&2
+            exit 1
+          fi
+          # 列出仓库中的所有 ZIP 文件
+          list_repo_zip_files() {
+            local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
+            # 使用 iconv 确保编码转换
+            local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
+            echo "$decoded_zip_files"
+          }
+          zip_files=$(list_repo_zip_files)
+          if [ -z "$zip_files" ]; then
+            echo "警告：仓库中没有 ZIP 文件。"
+            echo "ZIP_FILES=" >> $GITHUB_ENV
+          else
+            echo "仓库中的 ZIP 文件列表（解码后）:"
+            echo "$zip_files"
+            # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
+            escaped_zip_files=$(printf "%q" "$zip_files")
+            echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
+          fi
+
+     - name: Check if downloaded ZIP filename matches a file in the repository
        id: check-match
        run: |
-          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配 
-          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
-          zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配
+          downloaded_zip_name="${DOWNLOADED_ZIP_NAME}"
+          zip_files="${ZIP_FILES}"
           if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
             echo "下载的 ZIP 文件名: $downloaded_zip_name"
             echo "ZIP 文件名已存在于仓库中"
