@@ -24,11 +24,10 @@ api_hash = os.getenv('TELEGRAM_API_HASH')
 session = 'session'
 
 # 消息偏移点 id，表示从哪一条消息开始下载，可以忽略之前已经处理过的消息
-offset_id = 0  # 修改为0，从偏移量从头开始查
+offset_id = 0
 
 # 每次查询的消息数量
-message_limit = 5  # 修改为每次查询5条消息
-
+message_limit = 1
 # 想要下载的频道用户名，如果频道地址是 https://t.me/abc，那么频道名称为 "abc"
 channel_username = 'juejijianghu'
 # ************************************************************
@@ -86,28 +85,31 @@ async def download_media():
     """
     获取频道消息，并下载视频消息
     """
-    global channel_username, offset_id  # 添加offset_id为全局变量
+    global channel_username
     channel_entity = await client.get_entity(channel_username)
 
+    offset = offset_id
     while True:
-        # 每次查询 message_limit 条消息
-        messages = await client.get_messages(channel_entity, limit=message_limit, offset_id=offset_id)  # 修改为从offset_id开始查询
 
-        print("\n查到消息数量: ", len(messages), '偏移id', offset_id)
+        # 每次查询 5 条消息
+        # messages = await client.get_messages(channel_entity, limit=message_limit, reverse=True, offset_id=offset)
+        messages = await client.get_messages(channel_entity, limit=1, reverse=False)
+
+        print("\n查到消息数量: ", len(messages), '偏移id', offset)
         if not messages:
             break
-
         for message in messages:
-            if message.media and isinstance(message.media, MessageMediaDocument):
-                # 只保留zip文件
-                if 'zip' not in message.media.document.mime_type:  # 修改为检查mime_type是否包含zip
+            if message.media and isinstance(message.media,
+                                            MessageMediaDocument) and 'zip' in message.media.document.mime_type:
+
+                # 只保留zip
+                print("\nmime_type: ", message.media.document.attributes[0].file_name)
+                if message.media.document.mime_type != 'application/zip':
                     continue
 
-                # 创建保存目录
                 file_path = 'files/' + channel_username + "/"
-                os.makedirs(file_path, exist_ok=True)  # 确保目录存在
 
-                # 如果是消息组，保存到同一个文件夹里
+                # 如果是消息组 那么保存到同一个文件夹里
                 if message.grouped_id is not None:
                     file_name = f"{message.grouped_id}/{message.id}.zip"
                 else:
@@ -117,9 +119,9 @@ async def download_media():
                 print("\n开始下载: ", file_name)
                 await client.download_media(message=message, file=file_name,
                                             progress_callback=upload_progress_callback)
-
-        # 更新偏移量
-        offset_id = messages[-1].id  # 修改为更新偏移量为最后一条消息的ID
+        break
+        # # 更新偏移量
+        # offset = offset + message_limit
 
 
 print('starting....')
