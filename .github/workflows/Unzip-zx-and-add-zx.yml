@@ -1,79 +1,79 @@
 name: Unzip zx and add zx
 
 on:
-  #push:
   schedule:
     - cron: '0 */8 * * *'
-# 这里默认24小时内执行3次
   workflow_dispatch:
-  
+
 jobs:
-
-  run-python-script: 
-
+  run-python-script:
     runs-on: ubuntu-latest
 
     steps:
-     - name: Checkout
-       uses: actions/checkout@v4
-       with:
-         fetch-depth: 0 # 获取所有历史记录，以便搜索ZIP文件
-          
-     - name: Set up Python 3.9
-       uses: actions/setup-python@v5
-       with:
-        python-version: 3.9 # 可以根据需要更改 Python 版本
-        
-     - name: telethon download telegram channel zip
-       env:
-        TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
-        TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
-       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        python zx.py
-     
-     - name: Get the name of the downloaded ZIP file
-       id: get-zip-name
-       run: |
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取所有历史记录，以便搜索ZIP文件
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9 # 可以根据需要更改 Python 版本
+
+      - name: telethon download telegram channel zip
+        env:
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python zx.py
+
+      - name: Get the name of the downloaded ZIP file
+        id: get-zip-name
+        run: |
           # 获取下载的ZIP文件名
           downloaded_zip_name=$(ls ./files/juejijianghu/*.zip | head -n 1)
+          downloaded_zip_name=$(basename "$downloaded_zip_name")
           echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
-     - name: List ZIP files in the repository
-       id: list-zip-files
-       run: |
-         # 检查当前目录是否为 Git 仓库
-         is_git_repo() {
-           git rev-parse --is-inside-work-tree > /dev/null 2>&1
-         }
-         if ! is_git_repo; then
-           echo "错误：当前目录不是 Git 仓库。" >&2
-           exit 1
-         fi
-         # 列出仓库中的所有 ZIP 文件
-         list_repo_zip_files() {
-           local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
-           # 使用 iconv 确保编码转换
-           local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
-           echo "$decoded_zip_files"
-         }
-         zip_files=$(list_repo_zip_files)
-         if [ -z "$zip_files" ]; then
-           echo "警告：仓库中没有 ZIP 文件。"
-           echo "ZIP_FILES=" >> $GITHUB_ENV
-         else
-           echo "仓库中的 ZIP 文件列表（解码后）:"
-           echo "$zip_files"
-           # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
-           escaped_zip_files=$(printf "%q" "$zip_files")
-           echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
-         fi
-     - name: Check if downloaded ZIP filename matches a file in the repository 
-       id: check-match
-       run: |
-          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配 
-          downloaded_zip_name="${DOWNLOADED_ZIP_NAME##*/}"
-          zip_files="${ZIP_FILES//'%'/'\\%'}"  # 替换%字符，避免shell解释
+          echo "下载的 ZIP 文件名: $downloaded_zip_name"
+
+      - name: List ZIP files in the repository
+        id: list-zip-files
+        run: |
+          # 检查当前目录是否为 Git 仓库
+          is_git_repo() {
+            git rev-parse --is-inside-work-tree > /dev/null 2>&1
+          }
+          if ! is_git_repo; then
+            echo "错误：当前目录不是 Git 仓库。" >&2
+            exit 1
+          fi
+          # 列出仓库中的所有 ZIP 文件
+          list_repo_zip_files() {
+            local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
+            # 使用 iconv 确保编码转换
+            local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
+            echo "$decoded_zip_files"
+          }
+          zip_files=$(list_repo_zip_files)
+          if [ -z "$zip_files" ]; then
+            echo "警告：仓库中没有 ZIP 文件。"
+            echo "ZIP_FILES=" >> $GITHUB_ENV
+          else
+            echo "仓库中的 ZIP 文件列表（解码后）:"
+            echo "$zip_files"
+            # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
+            escaped_zip_files=$(printf "%q" "$zip_files")
+            echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
+          fi
+
+      - name: Check if downloaded ZIP filename matches a file in the repository
+        id: check-match
+        run: |
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配
+          downloaded_zip_name="${DOWNLOADED_ZIP_NAME}"
+          zip_files="${ZIP_FILES}"
           if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
             echo "下载的 ZIP 文件名: $downloaded_zip_name"
             echo "ZIP 文件名已存在于仓库中"
@@ -83,16 +83,16 @@ jobs:
             echo "ZIP 文件名不存在于仓库中"
             echo "ZIP_MATCH=false" >> $GITHUB_ENV
           fi
-      
-     - name: Unzip file
-       if: env.ZIP_MATCH == 'false'
-       run: |
+
+      - name: Unzip file
+        if: env.ZIP_MATCH == 'false'
+        run: |
           unzip -o files/juejijianghu/*.zip -d zx
-         
-     - name: Add unzipped files zx to zx
-       if: env.ZIP_MATCH == 'false'
-       run: |
-          git clone --depth 5 --branch zx https://github.com/xinyi1984/xytv.git 
+
+      - name: Add unzipped files zx to zx
+        if: env.ZIP_MATCH == 'false'
+        run: |
+          git clone --depth 5 --branch zx https://github.com/xinyi1984/xytv.git
           rm -r xytv/json/*
           rm -r xytv/lib/*
           rm -r xytv/custom_spider.jar
@@ -102,7 +102,6 @@ jobs:
           rm -r xytv/*.zip
           mv ./zx/* xytv
           cp ./files/juejijianghu/*.zip xytv
-          #sed -i "s#http://127.0.0.1:35457#http://127.0.0.1:10079/c/3600/null/http://127.0.0.1:35456#g" xytv/FongMi.json
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" xytv/FongMi.json
           cd xytv
           if git diff --quiet; then
@@ -117,12 +116,12 @@ jobs:
             git commit -m "更新FongMi Add unzipped files to xytv"
             git push -f -u origin zx
           fi
-       continue-on-error: true
-       
-     - name: Upload zip To telegram-channel-zip-downloader
-       if: env.ZIP_MATCH == 'false'
-       run: |  
-          rm -rf  xytv
+        continue-on-error: true
+
+      - name: Upload zip To telegram-channel-zip-downloader
+        if: env.ZIP_MATCH == 'false'
+        run: |
+          rm -rf xytv
           rm -r ./真心*.zip
           rm -r ./zx
           mv ./files/juejijianghu/*.zip .
