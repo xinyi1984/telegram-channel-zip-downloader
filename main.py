@@ -90,39 +90,39 @@ async def download_media():
 
     offset = offset_id
     while True:
-
         # 每次查询 5 条消息
-        # messages = await client.get_messages(channel_entity, limit=message_limit, reverse=True, offset_id=offset)
-        messages = await client.get_messages(channel_entity, limit=1, reverse=False)
+        messages = await client.get_messages(channel_entity, limit=message_limit, reverse=True, offset_id=offset)
 
         print("\n查到消息数量: ", len(messages), '偏移id', offset)
         if not messages:
             break
+
+        last_zip_message = None  # 用于记录最后一个符合条件的 ZIP 消息
+
         for message in messages:
             if message.media and isinstance(message.media,
                                             MessageMediaDocument) and 'zip' in message.media.document.mime_type:
-
                 # 只保留zip
                 print("\nmime_type: ", message.media.document.attributes[0].file_name)
-                if message.media.document.mime_type != 'application/zip':
-                    continue
+                if message.media.document.mime_type == 'application/zip':
+                    last_zip_message = message  # 更新最后一个符合条件的 ZIP 消息
 
-                file_path = 'files/' + channel_username + "/"
+        if last_zip_message:
+            file_path = 'files/' + channel_username + "/"
 
-                # 如果是消息组 那么保存到同一个文件夹里
-                if message.grouped_id is not None:
-                    file_name = f"{message.grouped_id}/{message.id}.zip"
-                else:
-                    file_name = f"{message.media.document.attributes[0].file_name}"
+            # 如果是消息组 那么保存到同一个文件夹里
+            if last_zip_message.grouped_id is not None:
+                file_name = f"{last_zip_message.grouped_id}/{last_zip_message.id}.zip"
+            else:
+                file_name = f"{last_zip_message.media.document.attributes[0].file_name}"
 
-                file_name = file_path + file_name
-                print("\n开始下载: ", file_name)
-                await client.download_media(message=message, file=file_name,
-                                            progress_callback=upload_progress_callback)
-        break
-        # # 更新偏移量
-        # offset = offset + message_limit
+            file_name = file_path + file_name
+            print("\n开始下载: ", file_name)
+            await client.download_media(message=last_zip_message, file=file_name,
+                                        progress_callback=upload_progress_callback)
 
+        # 更新偏移量
+        offset = offset + message_limit
 
 print('starting....')
 
