@@ -2,6 +2,7 @@ import os
 import time
 from telethon.sync import TelegramClient
 from telethon.tl.types import MessageMediaDocument
+
 # ************************************************************
 #                       配置信息
 # ************************************************************
@@ -81,47 +82,87 @@ async def get_channel_message_count():
     print("当前频道共有消息数量: ", total_messages)
 
 
-async def download_media():
+# 注释掉原来的 download_media 函数
+# async def download_media():
+#     """
+#     获取频道消息，并下载视频消息
+#     """
+#     global channel_username
+#     channel_entity = await client.get_entity(channel_username)
+
+#     offset = offset_id
+#     while True:
+
+#         # 每次查询 5 条消息
+#         # messages = await client.get_messages(channel_entity, limit=message_limit, reverse=True, offset_id=offset)
+#         messages = await client.get_messages(channel_entity, limit=1, reverse=False)
+
+#         print("\n查到消息数量: ", len(messages), '偏移id', offset)
+#         if not messages:
+#             break
+#         for message in messages:
+#             if message.media and isinstance(message.media,
+#                                             MessageMediaDocument) and 'zip' in message.media.document.mime_type:
+
+#                 # 只保留zip
+#                 print("\nmime_type: ", message.media.document.attributes[0].file_name)
+#                 if message.media.document.mime_type != 'application/zip':
+#                     continue
+
+#                 file_path = 'files/' + channel_username + "/"
+
+#                 # 如果是消息组 那么保存到同一个文件夹里
+#                 if message.grouped_id is not None:
+#                     file_name = f"{message.grouped_id}/{message.id}.zip"
+#                 else:
+#                     file_name = f"{message.media.document.attributes[0].file_name}"
+
+#                 file_name = file_path + file_name
+#                 print("\n开始下载: ", file_name)
+#                 await client.download_media(message=message, file=file_name,
+#                                             progress_callback=upload_progress_callback)
+#         break
+#         # # 更新偏移量
+#         # offset = offset + message_limit
+
+
+# 新增函数：查询最新的5条消息中最新的一条zip进行下载
+async def download_latest_zip():
     """
-    获取频道消息，并下载视频消息
+    查询最新的5条消息中最新的一条zip进行下载
     """
     global channel_username
     channel_entity = await client.get_entity(channel_username)
 
-    offset = offset_id
-    while True:
+    # 查询最新的5条消息
+    messages = await client.get_messages(channel_entity, limit=5)
 
-        # 每次查询 5 条消息
-        # messages = await client.get_messages(channel_entity, limit=message_limit, reverse=True, offset_id=offset)
-        messages = await client.get_messages(channel_entity, limit=1, reverse=False)
+    print("\n查到消息数量: ", len(messages))
+    if not messages:
+        return
 
-        print("\n查到消息数量: ", len(messages), '偏移id', offset)
-        if not messages:
-            break
-        for message in messages:
-            if message.media and isinstance(message.media,
-                                            MessageMediaDocument) and 'zip' in message.media.document.mime_type:
+    # 遍历消息，找到最新的zip文件
+    for message in messages:
+        if message.media and isinstance(message.media, MessageMediaDocument) and 'zip' in message.media.document.mime_type:
 
-                # 只保留zip
-                print("\nmime_type: ", message.media.document.attributes[0].file_name)
-                if message.media.document.mime_type != 'application/zip':
-                    continue
+            # 只保留zip
+            print("\nmime_type: ", message.media.document.attributes[0].file_name)
+            if message.media.document.mime_type != 'application/zip':
+                continue
 
-                file_path = 'files/' + channel_username + "/"
+            file_path = 'files/' + channel_username + "/"
 
-                # 如果是消息组 那么保存到同一个文件夹里
-                if message.grouped_id is not None:
-                    file_name = f"{message.grouped_id}/{message.id}.zip"
-                else:
-                    file_name = f"{message.media.document.attributes[0].file_name}"
+            # 如果是消息组 那么保存到同一个文件夹里
+            if message.grouped_id is not None:
+                file_name = f"{message.grouped_id}/{message.id}.zip"
+            else:
+                file_name = f"{message.media.document.attributes[0].file_name}"
 
-                file_name = file_path + file_name
-                print("\n开始下载: ", file_name)
-                await client.download_media(message=message, file=file_name,
-                                            progress_callback=upload_progress_callback)
-        break
-        # # 更新偏移量
-        # offset = offset + message_limit
+            file_name = file_path + file_name
+            print("\n开始下载: ", file_name)
+            await client.download_media(message=message, file=file_name,
+                                        progress_callback=upload_progress_callback)
+            break  # 下载最新的一条zip文件后退出循环
 
 
 print('starting....')
@@ -134,7 +175,10 @@ with client:
     # 获取频道消息数量
     client.loop.run_until_complete(get_channel_message_count())
 
-    # 获取并下载频道消息
-    client.loop.run_until_complete(download_media())
+    # 注释掉原来的 download_media 调用
+    # client.loop.run_until_complete(download_media())
+
+    # 调用新增的 download_latest_zip 函数
+    client.loop.run_until_complete(download_latest_zip())
 
 print('\ndone....')
