@@ -110,14 +110,15 @@ jobs:
           mv ./pg/* xytv
           cp ./files/PandaGroovePG/*.zip xytv
           # 下载 wex.json 文件
-          #if ! wget -O wex.json https://9280.kstore.space/wex.json; then
-            #echo "下载 wex.json 文件失败。"
-            #exit 1
-          #fi
+          if ! wget -O wex.json https://9280.kstore.space/wex.json; then
+            echo "下载 wex.json 文件失败。"
+            exit 1
+          fi
           # wex.json 插入应用商店
-          #sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" wex.json
+          sed -i "s#\"lives\": \[#\"lives\": [{\"name\": \"炸鸡翅\",\"url\": \"http://23.158.24.115:3412/?token=e4c5979e16&live=m3u\"},#g" wex.json
+          sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" wex.json
           # 将下载的 wex.json 复制到 xytv/json 目录
-          #mv wex.json xytv/json
+          mv wex.json xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#./json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
           # sed -i "s#lib/tokenm.json#lib/tokentemplate.json#g" xytv/jsm.json
