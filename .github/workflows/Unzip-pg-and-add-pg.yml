@@ -115,7 +115,7 @@ jobs:
             exit 1
           fi
           # wex.json 插入应用商店
-          sed -i "s#\"lives\": \[#\"lives\": [{\"name\": \"炸鸡翅\",\"url\": \"http://23.158.24.115:3412/?token=e4c5979e16&live=m3u\"},#g" wex.json
+          sed -i "s#\"lives\": \[#\"lives\": [{\"name\": \"炸鸡翅\",\"url\": \"http://23.158.24.115:3412/?token=e4c5979e16\&live=m3u\"},#g" wex.json
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" wex.json
           # 将下载的 wex.json 复制到 xytv/json 目录
           mv wex.json xytv
