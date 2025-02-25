@@ -141,25 +141,33 @@ jobs:
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
        run: |
-          echo "Cleaning up old files..."  
-          rm -rf  xytv
-          rm -r ./pg*.zip
-          rm -r ./pg
-          
-          echo "Moving new ZIP files..."
-          mv ./files/PandaGroovePG/*.zip .
-          
-          echo "Configuring Git..."
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --global http.postBuffer 524288000  # 增加缓冲区大小
-          git config --global core.compression 9        # 启用压缩
-          
-          echo "Adding and committing changes..."
-          git add .
-          git status
-          git commit -m "更新zip"
+         # 清理旧文件
+         echo "Cleaning up old files..."
+         rm -rf xytv
+         rm -rf ./pg*.zip
+         rm -rf ./pg
 
-          echo "Pushing changes to remote..."
-          git push -f -u origin main
-       continue-on-error: true         
+         # 移动新的 ZIP 文件到当前目录
+         echo "Moving new ZIP files..."
+         mv ./files/PandaGroovePG/*.zip .
+
+         # 配置 Git 用户名和邮箱
+         echo "Configuring Git..."
+         git config --global user.name "github-actions[bot]"
+         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+         # 设置 Git LFS（用于管理大文件）
+         echo "Setting up Git LFS..."
+         git lfs install  # 初始化 Git LFS
+         git lfs track "*.zip"  # 跟踪所有 ZIP 文件
+         git add .gitattributes  # 将 .gitattributes 文件添加到仓库
+
+         # 添加更改并提交
+         echo "Adding and committing changes..."
+         git add .  # 添加所有更改
+         git status  # 查看当前状态
+         git commit -m "更新zip"  # 提交更改
+
+         # 推送更改到远程仓库
+         echo "Pushing changes to remote..."
+         git push -f -u origin main  # 强制推送到 main 分支
