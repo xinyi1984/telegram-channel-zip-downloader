@@ -58,18 +58,24 @@ jobs:
             exit 1
           fi
           # 列出仓库中的所有 ZIP 文件
-          raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
-          # 使用 iconv 确保编码转换
-          decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
-          if [ -z "$decoded_zip_files" ]; then
-            echo "警告：仓库中没有 ZIP 文件。"
-            echo "decoded_zip_files=" >> $GITHUB_ENV
-          else
-            echo "仓库中的 ZIP 文件列表:"
+          list_repo_zip_files() {
+            local raw_zip_files=$(git -c core.quotepath=false ls-tree -r --name-only HEAD | grep -E '\.zip$' || true)
+            # 使用 iconv 确保编码转换
+            local decoded_zip_files=$(echo -e "$raw_zip_files" | iconv -f UTF-8 -t UTF-8 2>/dev/null || echo -e "$raw_zip_files")
             echo "$decoded_zip_files"
-            echo "decoded_zip_files=$decoded_zip_files" >> $GITHUB_ENV  # 将 ZIP 文件列表存储到环境变量
+          }
+          zip_files=$(list_repo_zip_files)
+          if [ -z "$zip_files" ]; then
+            echo "警告：仓库中没有 ZIP 文件。"
+            echo "ZIP_FILES=" >> $GITHUB_ENV
+          else
+            echo "仓库中的 ZIP 文件列表（解码后）:"
+            echo "$zip_files"
+            # 对 ZIP_FILES 进行转义处理，避免特殊字符问题
+            escaped_zip_files=$(printf "%q" "$zip_files")
+            echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
           fi
-
+          
       # 步骤 6：检查下载的 ZIP 文件名是否与仓库中的 ZIP 文件名匹配
       - name: Check if downloaded ZIP filename matches a file in the repository
         id: check-match
