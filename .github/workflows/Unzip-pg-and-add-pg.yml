@@ -147,6 +147,8 @@ jobs:
           mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 设置更大的 HTTP 缓冲区
+          git config --global http.postBuffer 524288000  # 500MB，可根据实际情况调整
           git add .
           git commit -m "更新zip"
           git push -f -u origin main
