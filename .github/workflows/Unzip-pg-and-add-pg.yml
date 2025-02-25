@@ -164,11 +164,12 @@ jobs:
           # 清理旧文件
           echo "Cleaning up old files..."
           rm -rf xytv
+          rm -rf ./pg*.zip
           rm -rf ./pg
 
           # 移动新的 ZIP 文件到当前目录
-          echo "Moving new ZIP files..."
-          mv ./files/PandaGroovePG/*.zip .
+          #echo "Moving new ZIP files..."
+          #mv ./files/PandaGroovePG/*.zip .
 
           # 检查 ZIP 文件是否存在
           echo "Checking if ZIP file exists..."
@@ -182,10 +183,8 @@ jobs:
           # 设置 Git LFS（用于管理大文件）
           echo "Setting up Git LFS..."
           git lfs install  # 初始化 Git LFS
-          git lfs track "*.zip"  # 跟踪所有 ZIP 文件
+          git lfs track "$DOWNLOADED_ZIP_NAME  # 跟踪下载 ZIP 文件
           git add .gitattributes  # 将 .gitattributes 文件添加到仓库
-          rm -rf ./pg*.zip
-
           # 添加更改并提交
           echo "Adding and committing changes..."
           git add .
