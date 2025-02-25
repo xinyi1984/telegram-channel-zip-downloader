@@ -122,33 +122,16 @@ jobs:
       - name: Upload zip To telegram-channel-zip-downloader
         if: env.ZIP_MATCH == 'false'
         run: |
-         # 清理旧文件
          echo "Cleaning up old files..."
          rm -rf xytv
          rm -r ./真心*.zip
          rm -r ./zx
-
-         # 移动新的 ZIP 文件到当前目录
-         echo "Moving new ZIP files..."
          mv ./files/juejijianghu/*.zip .
-
-         # 配置 Git 用户名和邮箱
-         echo "Configuring Git..."
          git config --global user.name "github-actions[bot]"
          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-         # 设置 Git LFS（用于管理大文件）
-         echo "Setting up Git LFS..."
-         git lfs install  # 初始化 Git LFS
-         git lfs track "*.zip"  # 跟踪所有 ZIP 文件
-         git add .gitattributes  # 将 .gitattributes 文件添加到仓库
-
-         # 添加更改并提交
-         echo "Adding and committing changes..."
-         git add .  # 添加所有更改
-         git status  # 查看当前状态
-         git commit -m "更新zip"  # 提交更改
-
-         # 推送更改到远程仓库
-         echo "Pushing changes to remote..."
-         git push -f -u origin main  # 强制推送到 main 分支
+         # 设置更大的 HTTP 缓冲区
+         git config --global http.postBuffer 524288000  # 500MB，可根据实际情况调整
+         git add .
+         git commit -m "更新zip"
+         git push -f -u origin main
+        continue-on-error: true
