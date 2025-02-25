@@ -140,13 +140,26 @@ jobs:
        
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
-       run: |  
+       run: |
+          echo "Cleaning up old files..."  
           rm -rf  xytv
           rm -r ./pg*.zip
           rm -r ./pg
+          
+          echo "Moving new ZIP files..."
           mv ./files/PandaGroovePG/*.zip .
+          
+          echo "Configuring Git..."
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global http.postBuffer 524288000  # 增加缓冲区大小
+          git config --global core.compression 9        # 启用压缩
+          
+          echo "Adding and committing changes..."
           git add .
+          git status
           git commit -m "更新zip"
+
+          echo "Pushing changes to remote..."
           git push -f -u origin main
+       continue-on-error: true         
