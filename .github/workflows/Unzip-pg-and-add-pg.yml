@@ -152,3 +152,4 @@ jobs:
           git add .
           git commit -m "更新zip"
           git push -f -u origin main
+       continue-on-error: true
