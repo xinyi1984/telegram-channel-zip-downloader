@@ -1,54 +1,50 @@
 name: Unzip pg and add pg
 
 on:
-  # 触发条件：
-  # 1. 定时任务（每 8 小时执行一次）
+  #push:
   schedule:
     - cron: '0 */8 * * *'
-  # 2. 手动触发
+# 这里默认24小时内执行3次
   workflow_dispatch:
-
+  
 jobs:
-  run-python-script:
-    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
+
+  run-python-script: 
+
+    runs-on: ubuntu-latest
 
     steps:
-      # 步骤 1：检出代码
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 获取所有历史记录，以便搜索 ZIP 文件
+     - name: Checkout
+       uses: actions/checkout@v4
+       with:
+         fetch-depth: 0 # 获取所有历史记录，以便搜索ZIP文件
+          
+     - name: Set up Python 3.9
+       uses: actions/setup-python@v5
+       with:
+        python-version: 3.9 # 可以根据需要更改 Python 版本
+        
+     - name: telethon download telegram channel zip
+       env:
+        TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+        TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+       run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        python pg.py
 
-      # 步骤 2：设置 Python 环境
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9  # 使用 Python 3.9
-
-      # 步骤 3：运行 Python 脚本下载 Telegram 频道的 ZIP 文件
-      - name: telethon download telegram channel zip
-        env:
-          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}  # 从 GitHub Secrets 获取 API ID
-          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}  # 从 GitHub Secrets 获取 API HASH
-        run: |
-          python -m pip install --upgrade pip  # 升级 pip
-          pip install -r requirements.txt  # 安装依赖
-          python pg.py  # 运行 Python 脚本
-
-      # 步骤 4：获取下载的 ZIP 文件名
-      - name: Get the name of the downloaded ZIP file
-        id: get-zip-name
-        run: |
-          # 获取下载的 ZIP 文件名
+     - name: Get the name of the downloaded ZIP file
+       id: get-zip-name
+       run: |
+          # 获取下载的ZIP文件名
           downloaded_zip_name=$(ls ./files/PandaGroovePG/*.zip | head -n 1)
           downloaded_zip_name=$(basename "$downloaded_zip_name")
-          echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV  # 将文件名存储到环境变量
+          echo "DOWNLOADED_ZIP_NAME=$downloaded_zip_name" >> $GITHUB_ENV
           echo "下载的 ZIP 文件名: $downloaded_zip_name"
 
-      # 步骤 5：列出仓库中的所有 ZIP 文件
-      - name: List ZIP files in the repository
-        id: list-zip-files
-        run: |
+     - name: List ZIP files in the repository
+       id: list-zip-files
+       run: |
           # 检查当前目录是否为 Git 仓库
           is_git_repo() {
             git rev-parse --is-inside-work-tree > /dev/null 2>&1
@@ -75,56 +71,32 @@ jobs:
             escaped_zip_files=$(printf "%q" "$zip_files")
             echo "ZIP_FILES=$escaped_zip_files" >> $GITHUB_ENV
           fi
-          
-      # 步骤 6：检查下载的 ZIP 文件名是否与仓库中的 ZIP 文件名匹配
-      - name: Check if downloaded ZIP filename matches a file in the repository
-        id: check-match
-        run: |
-          # 检查变量是否为空
-          if [ -z "$DOWNLOADED_ZIP_NAME" ]; then
-            echo "错误：未找到下载的 ZIP 文件名。"
-            exit 1
-          fi
-          if [ -z "$ZIP_FILES" ]; then
-            echo "警告：仓库中没有 ZIP 文件。"
-            echo "ZIP_MATCH=false" >> $GITHUB_ENV
+
+     - name: Check if downloaded ZIP filename matches a file in the repository
+       id: check-match
+       run: |
+          # 检查下载的ZIP文件名是否与仓库中的ZIP文件名匹配
+          downloaded_zip_name="${DOWNLOADED_ZIP_NAME}"
+          zip_files="${ZIP_FILES}"
+          if echo "$zip_files" | grep -qF -- "$downloaded_zip_name"; then
+            echo "下载的 ZIP 文件名: $downloaded_zip_name"
+            echo "ZIP 文件名已存在于仓库中"
+            echo "ZIP_MATCH=true" >> $GITHUB_ENV
           else
-            # 检查下载的 ZIP 文件名是否与仓库中的 ZIP 文件名匹配
-            if echo "$ZIP_FILES" | grep -qF -- "$DOWNLOADED_ZIP_NAME"; then
-              echo "下载的 ZIP 文件名: $DOWNLOADED_ZIP_NAME"
-              echo "ZIP 文件名已存在于仓库中"
-              echo "ZIP_MATCH=true" >> $GITHUB_ENV
-            else
-              echo "下载的 ZIP 文件名: $DOWNLOADED_ZIP_NAME"
-              echo "ZIP 文件名不存在于仓库中"
-              echo "ZIP_MATCH=false" >> $GITHUB_ENV
-            fi
+            echo "下载的 ZIP 文件名: $downloaded_zip_name"
+            echo "ZIP 文件名不存在于仓库中"
+            echo "ZIP_MATCH=false" >> $GITHUB_ENV
           fi
-
-      # 步骤 7：解压 ZIP 文件
-      - name: Unzip file
-        if: env.ZIP_MATCH == 'false'  # 仅在 ZIP 文件不匹配时执行
-        run: |
-          # 检查 ZIP 文件是否存在
-          if [ ! -f files/PandaGroovePG/*.zip ]; then
-            echo "错误：ZIP 文件不存在。"
-            exit 1
-          fi
-          # 解压 ZIP 文件到 pg 目录
+      
+     - name: Unzip file
+       if: env.ZIP_MATCH == 'false'
+       run: |
           unzip -o files/PandaGroovePG/*.zip -d pg
-
-      # 步骤 8：将解压后的文件添加到 xytv 仓库
-      - name: Add unzipped files pg to xytv
-        if: env.ZIP_MATCH == 'false'  # 仅在 ZIP 文件不匹配时执行
-        run: |
-          # 检查 pg 目录是否存在
-          if [ ! -d pg ]; then
-            echo "错误：pg 目录不存在。"
-            exit 1
-          fi
-          # 克隆 xytv 仓库
-          git clone --depth 5 https://github.com/xinyi1984/xytv.git
-          # 清理 xytv 目录
+         
+     - name: Add unzipped files pg to xytv
+       if: env.ZIP_MATCH == 'false'
+       run: |
+          git clone --depth 5 https://github.com/xinyi1984/xytv.git 
           rm -r xytv/js/*
           rm -r xytv/lib/*
           rm -r xytv/pg.jar
@@ -132,16 +104,25 @@ jobs:
           rm -r xytv/pg.jar.md5
           rm -r xytv/README.txt
           rm -r xytv/*.zip
+          #rm -r xytv/wex.json
           # 重命名 pg/lib/tokentemplate.json 为 pg/lib/tokenm.json
           mv pg/lib/tokentemplate.json pg/lib/tokenm.json
-          # 移动文件到 xytv 目录
           mv ./pg/* xytv
           cp ./files/PandaGroovePG/*.zip xytv
-          # 修改 jsm.json 文件
+          # 下载 wex.json 文件
+          #if ! wget -O wex.json https://9280.kstore.space/wex.json; then
+            #echo "下载 wex.json 文件失败。"
+            #exit 1
+          #fi
+          # wex.json 插入应用商店
+          #sed -i "s#\"lives\": \[#\"lives\": [{\"name\": \"炸鸡翅\",\"url\": \"http://23.158.24.115:3412/?token=e4c5979e16\&live=m3u\"},#g" wex.json
+          #sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" wex.json
+          # 将下载的 wex.json 复制到 xytv/json 目录
+          #mv wex.json xytv
           sed -i "s#https://fm.t4tv.hz.cz/json/market.json#./json/market.json#g" xytv/jsm.json
           sed -i "s#lib/alishare.txt#alishare.txt#g" xytv/jsm.json
+          # sed -i "s#lib/tokenm.json#lib/tokentemplate.json#g" xytv/jsm.json
           sed -i "s#lib/quarkshare.txt#quarkshare.txt#g" xytv/jsm.json
-          # 提交更改到 xytv 仓库
           cd xytv
           if git diff --quiet; then
             echo "没有未提交的更改。"
@@ -155,42 +136,17 @@ jobs:
             git commit -m "更新JSM Add unzipped files to xytv"
             git push -f -u origin master
           fi
-        continue-on-error: true  # 即使失败也继续执行后续步骤
-
-      # 步骤 9：将 ZIP 文件上传到 telegram-channel-zip-downloader 仓库
-      - name: Upload zip To telegram-channel-zip-downloader
-        if: env.ZIP_MATCH == 'false'  # 仅在 ZIP 文件不匹配时执行
-        run: |
-          # 清理旧文件
-          echo "Cleaning up old files..."
-          rm -rf xytv
-          rm -rf ./pg*.zip
-          rm -rf ./pg
-
-          # 移动新的 ZIP 文件到当前目录
-          #echo "Moving new ZIP files..."
-          #mv ./files/PandaGroovePG/*.zip .
-
-          # 检查 ZIP 文件是否存在
-          echo "Checking if ZIP file exists..."
-          ls -la
-
-          # 配置 Git 用户名和邮箱
-          echo "Configuring Git..."
+       continue-on-error: true
+       
+     - name: Upload zip To telegram-channel-zip-downloader
+       if: env.ZIP_MATCH == 'false'
+       run: |  
+          rm -rf  xytv
+          rm -r ./pg*.zip
+          rm -r ./pg
+          mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # 设置 Git LFS（用于管理大文件）
-          echo "Setting up Git LFS..."
-          git lfs install  # 初始化 Git LFS
-          git lfs track "$DOWNLOADED_ZIP_NAME  # 跟踪下载 ZIP 文件
-          git add .gitattributes  # 将 .gitattributes 文件添加到仓库
-          # 添加更改并提交
-          echo "Adding and committing changes..."
           git add .
-          git status
           git commit -m "更新zip"
-
-          # 推送更改到远程仓库
-          echo "Pushing changes to remote..."
           git push -f -u origin main
