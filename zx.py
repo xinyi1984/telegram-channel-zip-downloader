@@ -50,6 +50,11 @@ async def fetch_latest_zip():
         if not filename_attr:
             print(f"\n⚠️ 消息 {msg.id} 缺少文件名属性，已跳过")
             continue
+        
+        # 检查文件名是否以“真心”开头
+        file_name = filename_attr.file_name
+        if not file_name.startswith("真心"):
+            continue    
 
         # 构建存储路径
         base_dir = os.path.join('files', channel_username)
