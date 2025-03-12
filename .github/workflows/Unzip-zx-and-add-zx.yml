@@ -102,7 +102,7 @@ jobs:
           rm -r xytv/*.zip
           mv ./zx/* xytv
           cp ./files/juejijianghu/*.zip xytv
-          sed -i "s#\"lives\": \[#\"lives\": [{\"name\": \"中国移动ITV\",\"url\": \"http://xg.52sw.top/iptv/dns-itv.txt\",\"epg\": \"https://epg.v1.mk/json?ch={name}\&date={date}\",\"logo\": \"https://epg.v1.mk/logo/{name}.png\",\"ua\": \"okhttp/3.15\",\"catchup\": {\"type\": \"append\",\"replace\": \"livemode=1,livemode=4\",\"source\": \"\&starttime=\${(b)yyyyMMdd'T'HHmm}00.00Z\&endtime=\${(e)yyyyMMdd'T'HHmm}00.00Z\"}},#g" xytv/FongMi.json
+          sed -i "s#\"lives\": \[#\"lives\": [{\"name\": \"xg.52sw.top/ipt\", \"url\": \"http://xg.52sw.top/iptv/itv.m3u\" },{\"name\": \"中国移动ITV\",\"url\": \"http://xg.52sw.top/iptv/dns-itv.txt\",\"epg\": \"https://epg.v1.mk/json?ch={name}\&date={date}\",\"logo\": \"https://epg.v1.mk/logo/{name}.png\",\"ua\": \"okhttp/3.15\",\"catchup\": {\"type\": \"append\",\"replace\": \"livemode=1,livemode=4\",\"source\": \"\&starttime=\${(b)yyyyMMdd'T'HHmm}00.00Z\&endtime=\${(e)yyyyMMdd'T'HHmm}00.00Z\"}},#g" xytv/FongMi.json
           sed -i "s#\"sites\": \[#\"sites\": [{\"key\": \"应用商店\",\"name\": \"应用商店\",\"type\": 3,\"api\": \"csp_Market\",\"searchable\": 0,\"changeable\": 0,\"ext\": \"https://ghfast.top/https://raw.githubusercontent.com/xinyi1984/xytv/master/json/market.json\",\"jar\": \"https://ghfast.top/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/jar/custom_spider.jar\"},#g" xytv/FongMi.json
           cd xytv
           if git diff --quiet; then
