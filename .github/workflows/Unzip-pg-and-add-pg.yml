@@ -140,16 +140,14 @@ jobs:
        
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
-       run: |  
-          rm -rf  xytv
-          rm -r ./pg*.zip
-          rm -r ./pg
+        run: |
+          # 清理环境 (合并操作)
+          find . -maxdepth 1 -name '*.zip' -delete
+          rm -rf xytv pg 2>/dev/null
           mv ./files/PandaGroovePG/*.zip .
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 设置更大的 HTTP 缓冲区
-          git config --global http.postBuffer 524288000  # 500MB，可根据实际情况调整
-          git add .
-          git commit -m "更新zip"
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "au更新zip: $(date +'%Y%m%d%H%M')"
           git push -f -u origin main
-       continue-on-error: true
+        continue-on-error: true
