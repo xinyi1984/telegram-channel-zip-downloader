@@ -141,9 +141,9 @@ jobs:
      - name: Upload zip To telegram-channel-zip-downloader
        if: env.ZIP_MATCH == 'false'
        run: |
-         # 清理环境 (合并操作)
-         find . -maxdepth 1 -name '*.zip' -delete
-         rm -rf xytv pg 2>/dev/null
+         rm -rf xytv
+         rm -rf ./pg*.zip
+         rm -rf ./pg
          mv ./files/PandaGroovePG/*.zip .
          git config --global user.name "github-actions[bot]"
          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
